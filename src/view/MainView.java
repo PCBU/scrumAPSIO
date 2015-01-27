@@ -80,7 +80,7 @@ public class MainView{
 	/**
 	 * Affiche le contenu sur l'ecran principal
 	 * 
-	 * @param contenu
+	 * @param message
 	 */
 	public void afficher(String message)
 	{
