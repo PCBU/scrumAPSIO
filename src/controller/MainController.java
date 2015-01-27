@@ -18,20 +18,22 @@ public class MainController {
 
     public void commande(String commande) {
 
-        if (commande.equals("listeconsultant")) {
+		String[] splitCommande = commande.split(" ");
+
+        if (splitCommande[0].equals("listeconsultant")) {
             ArrayList<Consultant> listeConsultants = ConsultantService.listeConsultants();
             mainView.afficher("Liste des consultants :");
             for (Consultant consultant : listeConsultants) {
                 mainView.afficher(consultant.toString());
             }
 
-        } else if (commande.equals("listeconsultantlibre")) {
+        } else if (splitCommande[0].equals("listeconsultantlibre")) {
             mainView.afficher("Liste des consultants actuellement libre :");
 
-        } else if (commande.equals("clear")) {
+        } else if (splitCommande[0].equals("clear")) {
             mainView.effacer();
 
-        } else if (commande.equals("creermission")) {
+        } else if (splitCommande[0].equals("creermission")) {
 
 
         } else { //cas ou la commande n'est pas reconnue
