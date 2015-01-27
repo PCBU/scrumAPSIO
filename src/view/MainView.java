@@ -36,7 +36,7 @@ public class MainView{
 		mainFrame.setLayout(new BorderLayout());
 				
 		contenu = new JTextArea();
-		contenu.setEnabled(false);
+		contenu.setEnabled(true);
 		contenu.setEditable(false);				
 		
 		commande = new JTextField();
