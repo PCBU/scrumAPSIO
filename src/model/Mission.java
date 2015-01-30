@@ -26,11 +26,17 @@ public class Mission {
 	 */
 	private String intitule;
 
-	public Mission(Consultant consultant, Date debut, Date fin, String intitule) {
+	/**
+	 * Client associé à la mission
+	 */
+	private Client client;
+
+	public Mission(Consultant consultant, Date debut, Date fin, String intitule, Client client) {
 		this.consultant = consultant;
 		this.debut = debut;
 		this.fin = fin;
 		this.intitule = intitule;
+		this.client = client;
 	}
 
 	public Consultant getConsultant() {
@@ -53,16 +59,8 @@ public class Mission {
 		return fin;
 	}
 
-	public void setFin(Date fin) {
-		this.fin = fin;
-	}
-
-	public String getIntitule() {
-		return intitule;
-	}
-
-	public void setIntitule(String intitule) {
-		this.intitule = intitule;
+	public Client getClient() {
+		return client;
 	}
 
 	@Override
