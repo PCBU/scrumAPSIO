@@ -1,8 +1,12 @@
 package model;
 
+import org.joda.time.DateTime;
+
 import java.lang.Override;
 import java.lang.String;
 import java.util.Date;
+
+import static java.time.LocalDate.now;
 
 public class Mission {
 
@@ -14,12 +18,12 @@ public class Mission {
 	/**
 	 * Date de début
 	 */
-	private Date debut;
+	private DateTime debut;
 
 	/**
 	 * Date de fin
 	 */
-	private Date fin;
+	private DateTime fin;
 
 	/**
 	 * Intitulé de la mission
@@ -31,8 +35,15 @@ public class Mission {
 	 */
 	private Client client;
 
-	public Mission(Consultant consultant, Date debut, Date fin, String intitule, Client client) {
+	public Mission(Consultant consultant, DateTime debut, DateTime fin, String intitule, Client client) {
 		this.consultant = consultant;
+		this.debut = debut;
+		this.fin = fin;
+		this.intitule = intitule;
+		this.client = client;
+	}
+
+	public Mission(DateTime debut, DateTime fin, String intitule, Client client) {
 		this.debut = debut;
 		this.fin = fin;
 		this.intitule = intitule;
@@ -43,20 +54,16 @@ public class Mission {
 		return consultant;
 	}
 
-	public void setConsultant(Consultant consultant) {
-		this.consultant = consultant;
-	}
-
-	public Date getDebut() {
+	public DateTime getDebut() {
 		return debut;
 	}
 
-	public void setDebut(Date debut) {
-		this.debut = debut;
+	public DateTime getFin() {
+		return fin;
 	}
 
-	public Date getFin() {
-		return fin;
+	public String getIntitule() {
+		return intitule;
 	}
 
 	public Client getClient() {

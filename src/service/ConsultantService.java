@@ -1,8 +1,12 @@
 package service;
 
-import java.util.ArrayList;
-
 import model.Consultant;
+
+import java.util.ArrayList;
+import java.util.Optional;
+
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 public class ConsultantService {
 
@@ -15,5 +19,24 @@ public class ConsultantService {
 		listeConsultants.add(new Consultant("Roda","Sophie","11, Boulevard des Etats-Unis 31440 Toulouse","0422332539"));
 		
 		return listeConsultants;		
+	}
+
+	public static ArrayList<Consultant> consultantsDisponibles(ArrayList<Consultant> listeConsultants) {
+		ArrayList<Consultant> consultantsDisponibles = new ArrayList<Consultant>();
+
+		return consultantsDisponibles;
+	}
+
+	public static Optional<Consultant> getFirstConsultantByNom(ArrayList<Consultant> consultants, String nom) {
+
+		Optional<Consultant> validConsultant = ofNullable(null);
+
+		for (Consultant consultant : consultants) {
+			if (consultant.getNom().equals(nom)) {
+				validConsultant = of(consultant);
+			}
+		}
+
+		return validConsultant;
 	}
 }
