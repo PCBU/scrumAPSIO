@@ -39,6 +39,25 @@ public class Mission {
 		this.client = client;
 	}
 
+	/**
+	 * Constructeur sans consultant
+	 * @param debut
+	 * @param fin
+	 * @param intitule
+	 * @param client
+	 */
+	public Mission(Date debut, Date fin, String intitule, Client client) {
+		this.debut = debut;
+		this.fin = fin;
+		this.intitule = intitule;
+		this.client = client;
+	}
+
+
+	public Mission(){
+
+	}
+
 	public Consultant getConsultant() {
 		return consultant;
 	}
@@ -71,5 +90,9 @@ public class Mission {
 				", fin=" + fin +
 				", intitule='" + intitule + '\'' +
 				'}';
+	}
+
+	public boolean isVaccante() {
+		return this.consultant == null;
 	}
 }
