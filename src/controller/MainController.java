@@ -28,13 +28,24 @@ public class MainController {
             }
 
         } else if (splitCommande[0].equals("listeconsultantlibre")) {
-            mainView.afficher("Liste des consultants actuellement libre :");
+            mainView.afficher("Liste des consultants actuellement libres :");
 
         } else if (splitCommande[0].equals("clear")) {
             mainView.effacer();
 
         } else if (splitCommande[0].equals("creermission")) {
+			//Afficher consultants disponibles
 
+
+			//Vérifier nombre d'arguments
+
+
+
+			//Créer mission
+
+			//Afficher message validation
+
+			//Si arguments invalides, afficher syntaxe correcte
 
         } else { //cas ou la commande n'est pas reconnue
             mainView.afficher("commande '" + commande + "' inconnue.");
