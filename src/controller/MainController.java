@@ -5,7 +5,10 @@ import model.Consultant;
 import model.Mission;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
+
+import model.Mission;
 import service.ConsultantService;
+import service.MissionService;
 import view.MainView;
 
 import java.util.ArrayList;
@@ -18,14 +21,14 @@ import static service.ConsultantService.listeConsultants;
 public class MainController {
 
     private MainView mainView;
-
+    
     private ArrayList<Mission> missions;
 
     public MainController(MainView mainView) {
         super();
         this.mainView = mainView;
-
-        missions = new ArrayList<Mission>();
+        
+        this.missions = new ArrayList<Mission>();
     }
 
     public void commande(String commande) {
@@ -100,6 +103,15 @@ public class MainController {
 			//Créer mission
 
 			//Afficher message validation
+
+			//Si arguments invalides, afficher syntaxe correcte
+
+        } else if(splitCommande[0].equals("listemissionsvacantes")){
+            mainView.afficher("Liste des missions vacantes :");
+            for (Mission mission : missions) {
+                if (mission.isVaccante())
+                mainView.afficher(mission.toString());
+            }
 
         } else { //cas ou la commande n'est pas reconnue
             mainView.afficher("commande '" + commande + "' inconnue.");

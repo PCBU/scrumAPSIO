@@ -6,8 +6,6 @@ import java.lang.Override;
 import java.lang.String;
 import java.util.Date;
 
-import static java.time.LocalDate.now;
-
 public class Mission {
 
 	/**
@@ -78,5 +76,9 @@ public class Mission {
 				", fin=" + fin +
 				", intitule='" + intitule + '\'' +
 				'}';
+	}
+
+	public boolean isVaccante() {
+		return this.consultant == null;
 	}
 }

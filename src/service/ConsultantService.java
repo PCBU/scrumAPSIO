@@ -39,4 +39,5 @@ public class ConsultantService {
 
 		return validConsultant;
 	}
+
 }

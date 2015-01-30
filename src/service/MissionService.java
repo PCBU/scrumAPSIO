@@ -3,7 +3,6 @@ package service;
 import model.Client;
 import model.Consultant;
 import model.Mission;
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
@@ -11,8 +10,7 @@ import static service.ConsultantService.listeConsultants;
 
 public class MissionService {
 
-	public static ArrayList<Mission> tests()
-	{
+	public static ArrayList<Mission> tests() {
 		ArrayList<Consultant> consultants = listeConsultants();
 
 		ArrayList<Mission> listeMissions = new ArrayList<Mission>();
