@@ -5,10 +5,7 @@ import model.Consultant;
 import model.Mission;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
-
-import model.Mission;
 import service.ConsultantService;
-import service.MissionService;
 import view.MainView;
 
 import java.util.ArrayList;
