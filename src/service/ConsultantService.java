@@ -10,10 +10,10 @@ import static java.util.Optional.ofNullable;
 
 public class ConsultantService {
 
-	private static ArrayList<Consultant> listeConsultants = new ArrayList<Consultant>();
-	
 	public static ArrayList<Consultant> listeConsultants()
 	{
+
+		ArrayList<Consultant> listeConsultants = new ArrayList<Consultant>();
 
 		listeConsultants.add(new Consultant("Nguyen","Eric","35, impasse Francois Mitterand 31100 Toulouse","0545842539"));
 		listeConsultants.add(new Consultant("Martin","Thomas","41, Avenue du tournesol 31500 Toulouse","0522332539"));
@@ -22,13 +22,6 @@ public class ConsultantService {
 		
 		return listeConsultants;		
 	}
-
-	public static void ajoutConsultant(String nom, String prenom, String adresse, String telephone)
-	{
-		listeConsultants.add(new Consultant(nom, prenom, adresse, telephone));
-
-	}
-
 
 	public static ArrayList<Consultant> consultantsDisponibles(ArrayList<Consultant> listeConsultants) {
 		ArrayList<Consultant> consultantsDisponibles = new ArrayList<Consultant>();

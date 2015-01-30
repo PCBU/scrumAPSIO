@@ -9,9 +9,6 @@ import service.ConsultantService;
 import view.MainView;
 
 import java.util.ArrayList;
-
-public class MainController {
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static java.util.Optional.of;
@@ -20,7 +17,10 @@ import static service.ConsultantService.listeConsultants;
 
 public class MainController {
     private MainView mainView;
+
     private ArrayList<Consultant> consultants;
+    private ArrayList<Client> clients;
+    private ArrayList<Mission> missions;
 
     public MainController(MainView mainView) {
         super();
@@ -28,23 +28,22 @@ public class MainController {
 
         consultants = ConsultantService.listeConsultants();
 
+        this.consultants = listeConsultants();
         this.missions = new ArrayList<Mission>();
         this.clients = new ArrayList<Client>();
     }
 
     public void commande(String commande) {
-
         String[] splitCommande = commande.split(";");
 
         if (splitCommande[0].equals("listeconsultant")) {
-            ArrayList<Consultant> listeConsultants = ConsultantService.listeConsultants();
             mainView.afficher("Liste des consultants :");
             for (Consultant consultant : consultants) {
                 mainView.afficher(consultant.toString());
             }
 
         } else if (splitCommande[0].equals("creerclient")) {
-            if(splitCommande.length == 5) {
+            if (splitCommande.length == 5) {
                 Client nouveauClient = new Client(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]);
 
                 clients.add(nouveauClient);
@@ -59,13 +58,12 @@ public class MainController {
             // Ajoute un consultant, les paramètres sont le nom, prenom, adresse, telephone et doivent être séparer par ';'
         } else if (splitCommande[0].equals("creerconsultant")) {
             if (splitCommande.length == 5) {
-                ConsultantService.ajoutConsultant(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]);
+                consultants.add(new Consultant(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]));
 
             } else {
-                mainView.afficher("Il y as une erreur de syntaxe. Commande : creerconsultant;nom;prenom;adresse;telephone");
-
+                afficherSyntaxe(splitCommande[0]);
             }
-            
+
         } else if (splitCommande[0].equals("listeconsultantlibre")) {
             mainView.afficher("Liste des consultants actuellement libres :");
 
@@ -80,7 +78,6 @@ public class MainController {
             switch (splitCommande.length) {
                 case 6:
 
-                    ArrayList<Consultant> consultants = listeConsultants(); //TODO TEMPORARY, PLEASE DELETE AND REPLACE WITH ACTUAL LIST
                     Optional<Consultant> consultantMission = ConsultantService.getFirstConsultantByNom(consultants, splitCommande[1]);
 
                     if (!consultantMission.isPresent()) {
@@ -88,7 +85,7 @@ public class MainController {
                         break;
                     }
 
-                    //Optional<Client> clientMission = ClientService.getFirstClientByNom(consultants, splitCommande[5]);
+                    //Optional<Client> clientMission = ClientService.getFirstClientByNom(clients, splitCommande[5]);
                     Optional<Client> clientMission = of(new Client());
 
                     Mission mission = new Mission(consultantMission.get(),
@@ -123,14 +120,7 @@ public class MainController {
                     afficherSyntaxe(splitCommande[0]);
             }
 
-
-            //Créer mission
-
-            //Afficher message validation
-
-            //Si arguments invalides, afficher syntaxe correcte
-
-        } else if(splitCommande[0].equals("listemissionsvacantes")){
+        } else if (splitCommande[0].equals("listemissionsvacantes")) {
             mainView.afficher("Liste des missions vacantes :");
             for (Mission mission : missions) {
                 if (mission.isVaccante())
@@ -147,6 +137,8 @@ public class MainController {
 
         if (commande.equals("creermission")) {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\ncreermission;Nom consultant (facultatif);Date début jj-mm-aaaa;Date fin jj-mm-aaaa;Libellé;Id client");
+        } else if (commande.equals("creerconsultant")) {
+            mainView.afficher("Il y a une erreur de syntaxe. Commande : creerconsultant;nom;prenom;adresse;telephone");
         }
     }
 }
