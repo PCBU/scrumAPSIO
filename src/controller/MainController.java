@@ -16,21 +16,23 @@ import static org.joda.time.format.DateTimeFormat.forPattern;
 import static service.ConsultantService.listeConsultants;
 
 public class MainController {
-
     private MainView mainView;
-    
+
     private ArrayList<Mission> missions;
+
+    private ArrayList<Client> clients;
 
     public MainController(MainView mainView) {
         super();
         this.mainView = mainView;
-        
+
         this.missions = new ArrayList<Mission>();
+        this.clients = new ArrayList<Client>();
     }
 
     public void commande(String commande) {
 
-		String[] splitCommande = commande.split(";");
+        String[] splitCommande = commande.split(";");
 
         if (splitCommande[0].equals("listeconsultant")) {
             ArrayList<Consultant> listeConsultants = listeConsultants();
@@ -38,6 +40,19 @@ public class MainController {
             for (Consultant consultant : listeConsultants) {
                 mainView.afficher(consultant.toString());
             }
+
+        } else if (splitCommande[0].equals("creerclient")) {
+            if(splitCommande.length == 5) {
+                Client nouveauClient = new Client(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]);
+
+                clients.add(nouveauClient);
+
+                for (Client client : clients) {
+                    mainView.afficher("Liste des clients actuels : ");
+                    mainView.afficher(client.toString());
+                }
+            }
+            else  mainView.afficher("syntaxe incorrecte : creerclient;nom;prenom;adresse;telephone ");
 
         } else if (splitCommande[0].equals("listeconsultantlibre")) {
             mainView.afficher("Liste des consultants actuellement libres :");
@@ -49,7 +64,7 @@ public class MainController {
 
             DateTimeFormatter formatter = forPattern("dd-MM-yyyy");
 
-			//Vérifier nombre d'arguments
+            //Vérifier nombre d'arguments
             switch (splitCommande.length) {
                 case 6:
 
@@ -65,10 +80,10 @@ public class MainController {
                     Optional<Client> clientMission = of(new Client());
 
                     Mission mission = new Mission(consultantMission.get(),
-                                            DateTime.parse(splitCommande[2], formatter),
-                                            DateTime.parse(splitCommande[3], formatter),
-                                            splitCommande[4],
-                                            clientMission.get());
+                            DateTime.parse(splitCommande[2], formatter),
+                            DateTime.parse(splitCommande[3], formatter),
+                            splitCommande[4],
+                            clientMission.get());
 
                     missions.add(mission);
 
@@ -82,9 +97,9 @@ public class MainController {
                     Optional<Client> client = of(new Client());
 
                     Mission nouvelleMission = new Mission(DateTime.parse(splitCommande[2], formatter),
-                                                        DateTime.parse(splitCommande[3]),
-                                                        splitCommande[4],
-                                                        client.get());
+                            DateTime.parse(splitCommande[3]),
+                            splitCommande[4],
+                            client.get());
 
                     missions.add(nouvelleMission);
 
@@ -97,17 +112,17 @@ public class MainController {
             }
 
 
-			//Créer mission
+            //Créer mission
 
-			//Afficher message validation
+            //Afficher message validation
 
-			//Si arguments invalides, afficher syntaxe correcte
+            //Si arguments invalides, afficher syntaxe correcte
 
         } else if(splitCommande[0].equals("listemissionsvacantes")){
             mainView.afficher("Liste des missions vacantes :");
             for (Mission mission : missions) {
                 if (mission.isVaccante())
-                mainView.afficher(mission.toString());
+                    mainView.afficher(mission.toString());
             }
 
         } else { //cas ou la commande n'est pas reconnue
