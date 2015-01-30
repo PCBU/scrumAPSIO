@@ -9,6 +9,9 @@ import service.ConsultantService;
 import view.MainView;
 
 import java.util.ArrayList;
+
+public class MainController {
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static java.util.Optional.of;
@@ -17,14 +20,13 @@ import static service.ConsultantService.listeConsultants;
 
 public class MainController {
     private MainView mainView;
-
-    private ArrayList<Mission> missions;
-
-    private ArrayList<Client> clients;
+    private ArrayList<Consultant> consultants;
 
     public MainController(MainView mainView) {
         super();
         this.mainView = mainView;
+
+        consultants = ConsultantService.listeConsultants();
 
         this.missions = new ArrayList<Mission>();
         this.clients = new ArrayList<Client>();
@@ -35,9 +37,9 @@ public class MainController {
         String[] splitCommande = commande.split(";");
 
         if (splitCommande[0].equals("listeconsultant")) {
-            ArrayList<Consultant> listeConsultants = listeConsultants();
+            ArrayList<Consultant> listeConsultants = ConsultantService.listeConsultants();
             mainView.afficher("Liste des consultants :");
-            for (Consultant consultant : listeConsultants) {
+            for (Consultant consultant : consultants) {
                 mainView.afficher(consultant.toString());
             }
 
@@ -51,9 +53,19 @@ public class MainController {
                     mainView.afficher("Liste des clients actuels : ");
                     mainView.afficher(client.toString());
                 }
+            } else {
+                mainView.afficher("syntaxe incorrecte : creerclient;nom;prenom;adresse;telephone ");
             }
-            else  mainView.afficher("syntaxe incorrecte : creerclient;nom;prenom;adresse;telephone ");
+            // Ajoute un consultant, les paramètres sont le nom, prenom, adresse, telephone et doivent être séparer par ';'
+        } else if (splitCommande[0].equals("creerconsultant")) {
+            if (splitCommande.length == 5) {
+                ConsultantService.ajoutConsultant(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]);
 
+            } else {
+                mainView.afficher("Il y as une erreur de syntaxe. Commande : creerconsultant;nom;prenom;adresse;telephone");
+
+            }
+            
         } else if (splitCommande[0].equals("listeconsultantlibre")) {
             mainView.afficher("Liste des consultants actuellement libres :");
 
