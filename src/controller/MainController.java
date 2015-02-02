@@ -8,61 +8,44 @@ import org.joda.time.format.DateTimeFormatter;
 import service.ConsultantService;
 import view.MainView;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Optional.of;
 import static org.joda.time.format.DateTimeFormat.forPattern;
-import static service.ConsultantService.listeConsultants;
+import static service.ConsultantService.consultants;
 
 public class MainController {
     private MainView mainView;
 
-    private ArrayList<Consultant> consultants;
-    private ArrayList<Client> clients;
-    private ArrayList<Mission> missions;
+    private HashMap<String, Consultant> consultants;
+    private HashMap<String, Client> clients;
+    private HashMap<String, Mission> missions;
 
     public MainController(MainView mainView) {
         super();
         this.mainView = mainView;
 
-        consultants = ConsultantService.listeConsultants();
+        consultants = ConsultantService.consultants();
 
-        this.consultants = listeConsultants();
-        this.missions = new ArrayList<Mission>();
-        this.clients = new ArrayList<Client>();
+        this.consultants = consultants();
+        this.missions = new HashMap<String, Mission>();
+        this.clients = new HashMap<String, Client>();
     }
 
     public void commande(String commande) {
         String[] splitCommande = commande.split(";");
 
         if (splitCommande[0].equals("listeconsultant")) {
-            mainView.afficher("Liste des consultants :");
-            for (Consultant consultant : consultants) {
-                mainView.afficher(consultant.toString());
-            }
+            listeConsultant();
 
         } else if (splitCommande[0].equals("creerclient")) {
-            if (splitCommande.length == 5) {
-                Client nouveauClient = new Client(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]);
+            creerClient(splitCommande);
 
-                clients.add(nouveauClient);
-
-                for (Client client : clients) {
-                    mainView.afficher("Liste des clients actuels : ");
-                    mainView.afficher(client.toString());
-                }
-            } else {
-                mainView.afficher("syntaxe incorrecte : creerclient;nom;prenom;adresse;telephone ");
-            }
-            // Ajoute un consultant, les paramètres sont le nom, prenom, adresse, telephone et doivent être séparer par ';'
         } else if (splitCommande[0].equals("creerconsultant")) {
-            if (splitCommande.length == 5) {
-                consultants.add(new Consultant(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]));
-
-            } else {
-                afficherSyntaxe(splitCommande[0]);
-            }
+            creerConsultant(splitCommande);
 
         } else if (splitCommande[0].equals("listeconsultantlibre")) {
             mainView.afficher("Liste des consultants actuellement libres :");
@@ -72,60 +55,10 @@ public class MainController {
 
         } else if (splitCommande[0].equals("creermission")) {
 
-            DateTimeFormatter formatter = forPattern("dd-MM-yyyy");
-
-            //Vérifier nombre d'arguments
-            switch (splitCommande.length) {
-                case 6:
-
-                    Optional<Consultant> consultantMission = ConsultantService.getFirstConsultantByNom(consultants, splitCommande[1]);
-
-                    if (!consultantMission.isPresent()) {
-                        afficherSyntaxe(splitCommande[0]);
-                        break;
-                    }
-
-                    //Optional<Client> clientMission = ClientService.getFirstClientByNom(clients, splitCommande[5]);
-                    Optional<Client> clientMission = of(new Client());
-
-                    Mission mission = new Mission(consultantMission.get(),
-                            DateTime.parse(splitCommande[2], formatter),
-                            DateTime.parse(splitCommande[3], formatter),
-                            splitCommande[4],
-                            clientMission.get());
-
-                    missions.add(mission);
-
-                    mainView.afficher("Mission ajoutée\n" + mission);
-
-                    break;
-
-                case 5:
-
-                    //Optional<Client> clientMission = ClientService.getFirstClientByNom(consultants, splitCommande[5]);
-                    Optional<Client> client = of(new Client());
-
-                    Mission nouvelleMission = new Mission(DateTime.parse(splitCommande[2], formatter),
-                            DateTime.parse(splitCommande[3]),
-                            splitCommande[4],
-                            client.get());
-
-                    missions.add(nouvelleMission);
-
-                    mainView.afficher("Mission ajoutée\n" + nouvelleMission);
-
-                    break;
-
-                default:
-                    afficherSyntaxe(splitCommande[0]);
-            }
+            creerMission(splitCommande);
 
         } else if (splitCommande[0].equals("listemissionsvacantes")) {
-            mainView.afficher("Liste des missions vacantes :");
-            for (Mission mission : missions) {
-                if (mission.isVaccante())
-                    mainView.afficher(mission.toString());
-            }
+            listeMissionsVacantes();
 
         } else { //cas ou la commande n'est pas reconnue
             mainView.afficher("commande '" + commande + "' inconnue.");
@@ -133,12 +66,123 @@ public class MainController {
 
     }
 
+    private void listeConsultant() {
+        mainView.afficher("Liste des consultants :");
+
+        Iterator it = consultants.entrySet().iterator();
+        while (it.hasNext()) {
+            Consultant consultant = (Consultant) it.next();
+
+            mainView.afficher(consultant.toString());
+        }
+    }
+
+    private void creerClient(String[] splitCommande) {
+        if (splitCommande.length == 5) {
+            Client nouveauClient = new Client(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]);
+
+            clients.put(nouveauClient.getNom(), nouveauClient);
+
+            mainView.afficher("Liste des clients actuels : ");
+
+            Iterator it = clients.entrySet().iterator();
+            while (it.hasNext()) {
+                Client client = (Client) it.next();
+
+                mainView.afficher(client.toString());
+            }
+
+        } else {
+            mainView.afficher("syntaxe incorrecte : creerclient;nom;prenom;adresse;telephone ");
+        }
+    }
+
+    private void listeMissionsVacantes() {
+        mainView.afficher("Liste des missions vacantes :");
+
+        Iterator it = missions.entrySet().iterator();
+        while (it.hasNext()) {
+            Mission mission = (Mission) it.next();
+
+            if (mission.isVaccante()) {
+                mainView.afficher(mission.toString());
+            }
+        }
+    }
+
+    private void creerConsultant(String[] splitCommande) {
+
+        try {
+            consultants.put(splitCommande[1], new Consultant(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]));
+
+        } catch (Exception e) {
+            afficherSyntaxe(splitCommande[0]);
+        }
+    }
+
+    private void creerMission(String[] splitCommande) {
+
+        DateTimeFormatter formatter = forPattern("ddMMyyyy");
+
+        //Vérifier nombre d'arguments
+        switch (splitCommande.length) {
+            case 6:
+
+                Optional<Consultant> consultantMission = ConsultantService.getFirstConsultantByNom(consultants, splitCommande[1]);
+
+                if (!consultantMission.isPresent()) {
+                    afficherSyntaxe(splitCommande[0]);
+                    break;
+                }
+
+                //Optional<Client> clientMission = ClientService.getFirstClientByNom(clients, splitCommande[5]);
+                Optional<Client> clientMission = of(new Client());
+
+                Mission mission = new Mission(consultantMission.get(),
+                        DateTime.parse(splitCommande[2], formatter),
+                        DateTime.parse(splitCommande[3], formatter),
+                        splitCommande[4],
+                        clientMission.get());
+
+                missions.put(mission.getIntitule(), mission);
+
+                mainView.afficher("Mission ajoutée\n" + mission);
+
+                break;
+
+            case 5:
+
+                //Optional<Client> clientMission = ClientService.getFirstClientByNom(consultants, splitCommande[5]);
+                Optional<Client> client = of(new Client());
+
+                Mission nouvelleMission = new Mission(DateTime.parse(splitCommande[1], formatter),
+                        DateTime.parse(splitCommande[2]),
+                        splitCommande[3],
+                        client.get());
+
+                missions.put(nouvelleMission.getIntitule(), nouvelleMission);
+
+                mainView.afficher("Mission ajoutée\n" + nouvelleMission);
+
+                break;
+
+            default:
+                afficherSyntaxe(splitCommande[0]);
+        }
+    }
+
     private void afficherSyntaxe(String commande) {
 
         if (commande.equals("creermission")) {
-            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\ncreermission;Nom consultant (facultatif);Date début jj-mm-aaaa;Date fin jj-mm-aaaa;Libellé;Id client");
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\ncreermission;Nom consultant (facultatif);Date début jjmmaaaa;Date fin jjmmaaaa;Libellé;Nom du client");
+
         } else if (commande.equals("creerconsultant")) {
-            mainView.afficher("Il y a une erreur de syntaxe. Commande : creerconsultant;nom;prenom;adresse;telephone");
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\ncreerconsultant;Nom;Prenom;Adresse;Telephone");
+
+        } else if (commande.equals("envoyermission")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nenvoyermission;Nom du consultant;Libellé de la mission");
         }
     }
 }
+
+
