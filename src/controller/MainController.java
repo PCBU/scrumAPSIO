@@ -6,6 +6,7 @@ import model.Mission;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import service.ConsultantService;
+import service.MissionService;
 import view.MainView;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class MainController {
         consultants = ConsultantService.listeConsultants();
 
         this.consultants = listeConsultants();
-        this.missions = new ArrayList<Mission>();
+        this.missions = MissionService.tests();
         this.clients = new ArrayList<Client>();
     }
 
@@ -121,10 +122,23 @@ public class MainController {
             }
 
         } else if (splitCommande[0].equals("listemissionsvacantes")) {
-            mainView.afficher("Liste des missions vacantes :");
+            int nbMissionVacantes = 0;
+            // Compte le nombre de missions vacantes
             for (Mission mission : missions) {
                 if (mission.isVaccante())
-                    mainView.afficher(mission.toString());
+                    nbMissionVacantes++;
+            }
+
+            // Affichage des missions vacantes, ou pas
+            if (nbMissionVacantes == 0){
+                mainView.afficher("Aucune mission vacante");
+            }
+            else {
+                mainView.afficher("Liste des missions vacantes :");
+                for (Mission mission : missions) {
+                    if (mission.isVaccante())
+                        mainView.afficher(mission.toString());
+                }
             }
 
         } else { //cas ou la commande n'est pas reconnue
