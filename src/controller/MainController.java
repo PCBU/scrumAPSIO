@@ -149,8 +149,11 @@ public class MainController {
     private void creerConsultant(String[] splitCommande) {
 
         try {
-            consultants.put(splitCommande[1], new Consultant(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]));
+            Consultant consultant = new Consultant(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]);
 
+            consultants.put(splitCommande[1], consultant);
+
+            mainView.afficher(consultant.toString());
         } catch (IndexOutOfBoundsException e) {
             afficherSyntaxe(splitCommande[0]);
         }
