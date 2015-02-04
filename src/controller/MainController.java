@@ -226,7 +226,7 @@ public class MainController {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\ncreerconsultant;Nom;Prenom;Adresse;Telephone");
 
         } else if (commande.equals("envoyermission")) {
-            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nenvoyermission;Nom du consultant;Libellé de la mission");
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nenvoyermission;Libellé de la mission;Nom du consultant");
         }
     }
 }
