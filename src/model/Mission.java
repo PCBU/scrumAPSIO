@@ -2,11 +2,12 @@ package model;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
 import java.lang.Override;
 import java.lang.String;
 import java.util.Date;
 
-public class Mission {
+public class Mission implements Serializable {
 
 	public void setConsultant(Consultant consultant) {
 		this.consultant = consultant;

@@ -31,13 +31,28 @@ public class MainController {
         super();
         this.mainView = mainView;
 
-        consultants = ConsultantService.consultants();
+        consultants = ConsultantService.listeConsultants();
+        File f = new File("consultant.itl");
+        if (f.exists()) {
+            this.consultants = lireConsultant();
+        } else {
+            this.consultants = listeConsultants();
+        }
 
-        this.commandes = new ArrayList<String>();
+        f = new File("cission.itl");
+        if (f.exists()) {
+            this.missions = lireMission();
+        } else {
+            this.missions = new ArrayList<Mission>();
+        }
 
-        this.consultants = consultants();
-        this.missions = MissionService.tests(); //new HashMap<String, Mission>();
-        this.clients = new HashMap<String, Client>();
+        f = new File("client.itl");
+        if (f.exists()) {
+            this.clients = lireClient();
+        } else {
+            this.clients = new ArrayList<Client>();
+        }
+
     }
 
     public void commande(String commande) {
@@ -244,4 +259,111 @@ public class MainController {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nenvoyermission;Libellé de la mission;Nom du consultant");
         }
     }
+
+    private void enregistrerListeConsultant() throws IOException {
+        try {
+            OutputStream file = new FileOutputStream("consultant.itl");
+            OutputStream buffer = new BufferedOutputStream(file);
+            ObjectOutput output = new ObjectOutputStream(buffer);
+            output.writeObject(consultants);
+            output.close();
+            buffer.close();
+            file.close();
+        } catch (IOException ex) {
+            mainView.afficher("Certaines données n'ont pas pu être enregistrées, il se peut que des données soient perdues.");
+            ex.printStackTrace();
+        }
+
+    }
+
+    private void enregistrerListeClient() {
+
+        try {
+            OutputStream file = new FileOutputStream("Client.itl");
+            OutputStream buffer = new BufferedOutputStream(file);
+            ObjectOutput output = new ObjectOutputStream(buffer);
+            output.writeObject(clients);
+            output.close();
+            buffer.close();
+            file.close();
+        } catch (IOException ex) {
+            mainView.afficher("Certaines données n'ont pas pu être enregistrées, il se peut que des données soient perdues.");
+        }
+
+    }
+
+    private void enregistrerListeMission() {
+        try {
+            OutputStream file = new FileOutputStream("Mission.itl");
+            OutputStream buffer = new BufferedOutputStream(file);
+            ObjectOutput output = new ObjectOutputStream(buffer);
+            output.writeObject(missions);
+            output.close();
+            buffer.close();
+            file.close();
+        } catch (IOException ex) {
+            mainView.afficher("Certaines données n'ont pas pu être enregistrées, il se peut que des données soient perdues.");
+        }
+
+
+    }
+
+    private ArrayList<Consultant> lireConsultant() {
+        ArrayList<Consultant> transfert = new ArrayList<Consultant>();
+        try {
+            InputStream file = new FileInputStream("Consultant.itl");
+            InputStream buffer = new BufferedInputStream(file);
+            ObjectInput input = new ObjectInputStream(buffer);
+            transfert = (ArrayList<Consultant>) input.readObject();
+            input.close();
+            buffer.close();
+            file.close();
+
+        } catch (IOException ex) {
+            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- IOException.");
+        } catch (ClassNotFoundException ex) {
+            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
+        }
+        return transfert;
+    }
+
+    private ArrayList<Mission> lireMission() {
+        ArrayList<Mission> transfert = new ArrayList<Mission>();
+        try {
+            InputStream file = new FileInputStream("Mission.itl");
+            InputStream buffer = new BufferedInputStream(file);
+            ObjectInput input = new ObjectInputStream(buffer);
+            transfert = (ArrayList<Mission>) input.readObject();
+            input.close();
+            buffer.close();
+            file.close();
+
+        } catch (IOException ex) {
+            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- IOException.");
+        } catch (ClassNotFoundException ex) {
+            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
+        }
+        return transfert;
+    }
+
+    private ArrayList<Client> lireClient() {
+        ArrayList<Client> transfert = new ArrayList<Client>();
+        try {
+            InputStream file = new FileInputStream("Client.itl");
+            InputStream buffer = new BufferedInputStream(file);
+            ObjectInput input = new ObjectInputStream(buffer);
+            transfert = (ArrayList<Client>) input.readObject();
+            input.close();
+            buffer.close();
+            file.close();
+
+        } catch (IOException ex) {
+            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- IOException.");
+        } catch (ClassNotFoundException ex) {
+            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
+        }
+        return transfert;
+    }
+
+
 }

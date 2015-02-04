@@ -1,6 +1,8 @@
 package model;
 
-public class Consultant {
+import java.io.Serializable;
+
+public class Consultant implements Serializable {
 	private String nom;
 	private String prenom;
 	private String adresse;
