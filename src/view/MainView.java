@@ -1,12 +1,8 @@
 package view;
 
-import java.awt.BorderLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 import controller.MainController;
 
@@ -20,7 +16,7 @@ public class MainView{
 	private JTextArea contenu;
 	private JFrame mainFrame;
 	private JTextField commande;
-	
+	private JButton Bouton;
 	private MainController mainController;
 
 	public MainView() {
@@ -32,18 +28,48 @@ public class MainView{
 		/*
 		 * Initialisation des composants de la vue
 		 */
+		MouseListener interact = new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mainController.commande(commande.getText());
+				commande.setText("");
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+
+			}
+		};
+
 		mainFrame = new JFrame("Gestion des consultants");
 		mainFrame.setLayout(new BorderLayout());
-				
+		JPanel P1 = new JPanel(new BorderLayout());
 		contenu = new JTextArea();
 		contenu.setEnabled(true);
 		contenu.setEditable(false);				
 		
 		commande = new JTextField();
-		
+		Bouton = new JButton("Envoyer");
+		Bouton.addMouseListener(interact);
+
 		//Initialisation des evenements du textfield
 		commande.addKeyListener(new KeyListener() {
-			
+
 			@Override
 			public void keyTyped(KeyEvent arg0) {
 				String key = arg0.getKeyChar()+"";				
@@ -66,17 +92,18 @@ public class MainView{
 		/*
 		 * Ajout des composants a la vue
 		 */
+		P1.add(commande, BorderLayout.CENTER);
 		mainFrame.add(contenu, BorderLayout.CENTER);		
-		mainFrame.add(commande, BorderLayout.PAGE_END);
-		
+		mainFrame.add(P1, BorderLayout.PAGE_END);
+		P1.add(Bouton, BorderLayout.EAST);
 		//Initilisation des attributs de la vue
-		
+
 		mainFrame.pack();
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setSize(800, 400);
 		mainFrame.setVisible(true);	
-	}	
-	
+	}
+
 	/**
 	 * Affiche le contenu sur l'ecran principal
 	 * 
