@@ -6,6 +6,7 @@ import model.Mission;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import service.ConsultantService;
+import service.MissionService;
 import view.MainView;
 
 import java.util.HashMap;
@@ -90,14 +91,22 @@ public class MainController {
     }
 
     private void listeMissionsVacantes() {
-        mainView.afficher("Liste des missions vacantes :");
+        int nbMissionVacantes = 0;
+        // Compte le nombre de missions vacantes
+        for (Mission mission : missions) {
+            if (mission.isVaccante())
+                nbMissionVacantes++;
+        }
 
-        for (Map.Entry<String, Mission> entry : missions.entrySet()) {
-
-            Mission mission = entry.getValue();
-
-            if (mission.isVaccante()) {
-                mainView.afficher(mission.toString());
+        // Affichage des missions vacantes, ou pas
+        if (nbMissionVacantes == 0){
+            mainView.afficher("Aucune mission vacante");
+        }
+        else {
+            mainView.afficher("Liste des missions vacantes :");
+            for (Mission mission : missions) {
+                if (mission.isVaccante())
+                    mainView.afficher(mission.toString());
             }
         }
     }
@@ -173,5 +182,3 @@ public class MainController {
         }
     }
 }
-
-
