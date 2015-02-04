@@ -31,7 +31,7 @@ public class MainController {
         consultants = ConsultantService.consultants();
 
         this.consultants = consultants();
-        this.missions = new HashMap<String, Mission>();
+        this.missions = MissionService.tests(); //new HashMap<String, Mission>();
         this.clients = new HashMap<String, Client>();
     }
 
@@ -93,18 +93,20 @@ public class MainController {
     private void listeMissionsVacantes() {
         int nbMissionVacantes = 0;
         // Compte le nombre de missions vacantes
-        for (Mission mission : missions) {
-            if (mission.isVaccante())
+        for (Map.Entry<String, Mission> mission : missions.entrySet()) {
+            if (mission.getValue().isVaccante())
                 nbMissionVacantes++;
         }
 
         // Affichage des missions vacantes, ou pas
-        if (nbMissionVacantes == 0){
+        if (nbMissionVacantes == 0) {
             mainView.afficher("Aucune mission vacante");
-        }
-        else {
+        } else {
             mainView.afficher("Liste des missions vacantes :");
-            for (Mission mission : missions) {
+
+            for (Map.Entry<String, Mission> entry : missions.entrySet()) {
+                Mission mission = entry.getValue();
+
                 if (mission.isVaccante())
                     mainView.afficher(mission.toString());
             }
@@ -116,7 +118,7 @@ public class MainController {
         try {
             consultants.put(splitCommande[1], new Consultant(splitCommande[1], splitCommande[2], splitCommande[3], splitCommande[4]));
 
-        } catch (Exception e) {
+        } catch (IndexOutOfBoundsException e) {
             afficherSyntaxe(splitCommande[0]);
         }
     }
