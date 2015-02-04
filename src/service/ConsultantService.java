@@ -2,8 +2,8 @@ package service;
 
 import model.Consultant;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Optional.of;
@@ -34,7 +34,9 @@ public class ConsultantService {
 
 		Optional<Consultant> validConsultant = ofNullable(null);
 
-		for (Consultant consultant : consultants) {
+		for (Map.Entry<String, Consultant> entry : consultants.entrySet()) {
+			Consultant consultant = entry.getValue();
+
 			if (consultant.getNom().equals(nom)) {
 				validConsultant = of(consultant);
 			}

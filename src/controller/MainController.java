@@ -9,7 +9,6 @@ import service.ConsultantService;
 import view.MainView;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -54,7 +53,6 @@ public class MainController {
             mainView.effacer();
 
         } else if (splitCommande[0].equals("creermission")) {
-
             creerMission(splitCommande);
 
         } else if (splitCommande[0].equals("listemissionsvacantes")) {
@@ -69,11 +67,8 @@ public class MainController {
     private void listeConsultant() {
         mainView.afficher("Liste des consultants :");
 
-        Iterator it = consultants.entrySet().iterator();
-        while (it.hasNext()) {
-            Consultant consultant = (Consultant) it.next();
-
-            mainView.afficher(consultant.toString());
+        for (Map.Entry<String, Consultant> entry : consultants.entrySet()) {
+            mainView.afficher(entry.getValue().toString());
         }
     }
 
@@ -85,11 +80,8 @@ public class MainController {
 
             mainView.afficher("Liste des clients actuels : ");
 
-            Iterator it = clients.entrySet().iterator();
-            while (it.hasNext()) {
-                Client client = (Client) it.next();
-
-                mainView.afficher(client.toString());
+            for (Map.Entry<String, Client> client : clients.entrySet()) {
+                mainView.afficher(client.getValue().toString());
             }
 
         } else {
@@ -100,9 +92,9 @@ public class MainController {
     private void listeMissionsVacantes() {
         mainView.afficher("Liste des missions vacantes :");
 
-        Iterator it = missions.entrySet().iterator();
-        while (it.hasNext()) {
-            Mission mission = (Mission) it.next();
+        for (Map.Entry<String, Mission> entry : missions.entrySet()) {
+
+            Mission mission = entry.getValue();
 
             if (mission.isVaccante()) {
                 mainView.afficher(mission.toString());
@@ -124,10 +116,8 @@ public class MainController {
 
         DateTimeFormatter formatter = forPattern("ddMMyyyy");
 
-        //Vérifier nombre d'arguments
         switch (splitCommande.length) {
             case 6:
-
                 Optional<Consultant> consultantMission = ConsultantService.getFirstConsultantByNom(consultants, splitCommande[1]);
 
                 if (!consultantMission.isPresent()) {
@@ -151,7 +141,6 @@ public class MainController {
                 break;
 
             case 5:
-
                 //Optional<Client> clientMission = ClientService.getFirstClientByNom(consultants, splitCommande[5]);
                 Optional<Client> client = of(new Client());
 
