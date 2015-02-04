@@ -4,6 +4,7 @@ import model.Client;
 import model.Consultant;
 import model.Mission;
 import org.joda.time.DateTime;
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.format.DateTimeFormatter;
 import service.ConsultantService;
 import service.MissionService;
@@ -94,10 +95,13 @@ public class MainController {
 
         } else if (splitCommande[0].equals("consultantsdisponibles")) {
             consultantsDisponibles();
+
+        } else if (splitCommande[0].equals("consultantsdisponiblesdate")) {
+            consultantsDisponiblesDateT(splitCommande);
+
         } else { //cas ou la commande n'est pas reconnue
             mainView.afficher("commande '" + commande + "' inconnue.");
         }
-
     }
 
     private void consultantsDisponibles() {
@@ -107,6 +111,29 @@ public class MainController {
                 Consultant unConsultant = entry.getValue();
                 mainView.afficher(unConsultant.toString());
             }
+        }
+    }
+
+    private void consultantsDisponiblesDateT(String[] commande) {
+
+        if (commande.length >= 2) {
+            try {
+
+                DateTime parsedDate = DateTime.parse(commande[1], forPattern("ddMMyyyy"));
+
+                if (!MissionService.consultantsDisponiblesPourDate(this.consultants, this.missions, parsedDate).isEmpty()) {
+
+                    mainView.afficher("Consultants disponibles pour la date + " + parsedDate + " :");
+                    for (Map.Entry<String, Consultant> entry : MissionService.consultantsDisponibles(this.consultants, this.missions).entrySet()) {
+                        Consultant unConsultant = entry.getValue();
+                        mainView.afficher(unConsultant.toString());
+                    }
+                }
+            } catch (IllegalFieldValueException e) {
+                afficherSyntaxe("date");
+            }
+        } else {
+            afficherSyntaxe(commande[0]);
         }
     }
 
@@ -195,17 +222,22 @@ public class MainController {
                 //Optional<Client> clientMission = ClientService.getFirstClientByNom(clients, splitCommande[5]);
                 Optional<Client> clientMission = of(new Client());
 
-                Mission mission = new Mission(consultantMission.get(),
-                        DateTime.parse(splitCommande[2], formatter),
-                        DateTime.parse(splitCommande[3], formatter),
-                        splitCommande[4],
-                        clientMission.get());
+                try {
+                    Mission mission = new Mission(consultantMission.get(),
+                            DateTime.parse(splitCommande[2], formatter),
+                            DateTime.parse(splitCommande[3], formatter),
+                            splitCommande[4],
+                            clientMission.get());
 
-                missions.put(mission.getIntitule(), mission);
+                    missions.put(mission.getIntitule(), mission);
 
-                enregistrerListeMission();
+                    enregistrerListeMission();
 
-                mainView.afficher("Mission ajoutée\n" + mission);
+                    mainView.afficher("Mission ajoutée\n" + mission);
+
+                } catch (IllegalFieldValueException e) {
+                    afficherSyntaxe("date");
+                }
 
                 break;
 
@@ -213,16 +245,21 @@ public class MainController {
                 //Optional<Client> clientMission = ClientService.getFirstClientByNom(consultants, splitCommande[5]);
                 Optional<Client> client = of(new Client());
 
-                Mission nouvelleMission = new Mission(DateTime.parse(splitCommande[1], formatter),
-                        DateTime.parse(splitCommande[2]),
-                        splitCommande[3],
-                        client.get());
+                try {
+                    Mission nouvelleMission = new Mission(DateTime.parse(splitCommande[1], formatter),
+                            DateTime.parse(splitCommande[2]),
+                            splitCommande[3],
+                            client.get());
 
-                missions.put(nouvelleMission.getIntitule(), nouvelleMission);
+                    missions.put(nouvelleMission.getIntitule(), nouvelleMission);
 
-                enregistrerListeMission();
+                    enregistrerListeMission();
 
-                mainView.afficher("Mission ajoutée\n" + nouvelleMission);
+                    mainView.afficher("Mission ajoutée\n" + nouvelleMission);
+
+                } catch (IllegalFieldValueException e) {
+                    afficherSyntaxe("date");
+                }
 
                 break;
 
@@ -291,8 +328,14 @@ public class MainController {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nenvoyermission;Intitulé de la mission;Nom du consultant");
 
         } else if (commande.equals("retourmission")) {
-            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nretourmission;Intitulé de la mission");
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nenvoyermission;Libellé de la mission;Nom du consultant");
+
+        } else if (commande.equals("consultantsdisponiblesdate")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nconsultantsdisponiblesdate;Date jjmmaaaa");
+
+        } else if (commande.equals("date")) {
+            mainView.afficher("Format de date incorrect. Le format valide est jjmmaaaa.\nPour le 1er mars 2015, la syntaxe est : 01032015");
+
         }
     }
 
