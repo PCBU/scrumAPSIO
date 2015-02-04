@@ -9,6 +9,7 @@ import service.ConsultantService;
 import service.MissionService;
 import view.MainView;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,26 +32,27 @@ public class MainController {
         super();
         this.mainView = mainView;
 
-        consultants = ConsultantService.listeConsultants();
+        this.commandes = new ArrayList<String>();
+
         File f = new File("consultant.itl");
         if (f.exists()) {
             this.consultants = lireConsultant();
         } else {
-            this.consultants = listeConsultants();
+            this.consultants = consultants();
         }
 
         f = new File("cission.itl");
         if (f.exists()) {
             this.missions = lireMission();
         } else {
-            this.missions = new ArrayList<Mission>();
+            this.missions = new HashMap<String, Mission>();
         }
 
         f = new File("client.itl");
         if (f.exists()) {
             this.clients = lireClient();
         } else {
-            this.clients = new ArrayList<Client>();
+            this.clients = new HashMap<String, Client>();
         }
 
     }
@@ -127,14 +129,12 @@ public class MainController {
 
             clients.put(nouveauClient.getNom(), nouveauClient);
 
-            mainView.afficher("Liste des clients actuels : ");
+            enregistrerListeClient();
 
-            for (Map.Entry<String, Client> client : clients.entrySet()) {
-                mainView.afficher(client.getValue().toString());
-            }
+            mainView.afficher("Client ajouté : " + nouveauClient);
 
         } else {
-            mainView.afficher("syntaxe incorrecte : creerclient;nom;prenom;adresse;telephone ");
+            afficherSyntaxe("creerclient");
         }
     }
 
@@ -168,7 +168,9 @@ public class MainController {
 
             consultants.put(splitCommande[1], consultant);
 
-            mainView.afficher(consultant.toString());
+            enregistrerListeConsultant();
+
+            mainView.afficher("Consultant créé : " + consultant);
         } catch (IndexOutOfBoundsException e) {
             afficherSyntaxe(splitCommande[0]);
         }
@@ -198,6 +200,8 @@ public class MainController {
 
                 missions.put(mission.getIntitule(), mission);
 
+                enregistrerListeMission();
+
                 mainView.afficher("Mission ajoutée\n" + mission);
 
                 break;
@@ -212,6 +216,8 @@ public class MainController {
                         client.get());
 
                 missions.put(nouvelleMission.getIntitule(), nouvelleMission);
+
+                enregistrerListeMission();
 
                 mainView.afficher("Mission ajoutée\n" + nouvelleMission);
 
@@ -255,12 +261,15 @@ public class MainController {
         } else if (commande.equals("creerconsultant")) {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\ncreerconsultant;Nom;Prenom;Adresse;Telephone");
 
+        } else if (commande.equals("creerclient")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\ncreerclient;Nom;Prenom;Adresse;Telephone");
+
         } else if (commande.equals("envoyermission")) {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nenvoyermission;Libellé de la mission;Nom du consultant");
         }
     }
 
-    private void enregistrerListeConsultant() throws IOException {
+    private void enregistrerListeConsultant() {
         try {
             OutputStream file = new FileOutputStream("consultant.itl");
             OutputStream buffer = new BufferedOutputStream(file);
@@ -271,7 +280,6 @@ public class MainController {
             file.close();
         } catch (IOException ex) {
             mainView.afficher("Certaines données n'ont pas pu être enregistrées, il se peut que des données soient perdues.");
-            ex.printStackTrace();
         }
 
     }
@@ -308,13 +316,13 @@ public class MainController {
 
     }
 
-    private ArrayList<Consultant> lireConsultant() {
-        ArrayList<Consultant> transfert = new ArrayList<Consultant>();
+    private HashMap<String, Consultant> lireConsultant() {
+        HashMap<String, Consultant> transfert = new HashMap<String, Consultant>();
         try {
             InputStream file = new FileInputStream("Consultant.itl");
             InputStream buffer = new BufferedInputStream(file);
             ObjectInput input = new ObjectInputStream(buffer);
-            transfert = (ArrayList<Consultant>) input.readObject();
+            transfert = (HashMap<String, Consultant>) input.readObject();
             input.close();
             buffer.close();
             file.close();
@@ -324,16 +332,17 @@ public class MainController {
         } catch (ClassNotFoundException ex) {
             mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
         }
+
         return transfert;
     }
 
-    private ArrayList<Mission> lireMission() {
-        ArrayList<Mission> transfert = new ArrayList<Mission>();
+    private HashMap<String, Mission> lireMission() {
+        HashMap<String, Mission> transfert = new HashMap<String, Mission>();
         try {
             InputStream file = new FileInputStream("Mission.itl");
             InputStream buffer = new BufferedInputStream(file);
             ObjectInput input = new ObjectInputStream(buffer);
-            transfert = (ArrayList<Mission>) input.readObject();
+            transfert = (HashMap<String, Mission>) input.readObject();
             input.close();
             buffer.close();
             file.close();
@@ -343,16 +352,17 @@ public class MainController {
         } catch (ClassNotFoundException ex) {
             mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
         }
+
         return transfert;
     }
 
-    private ArrayList<Client> lireClient() {
-        ArrayList<Client> transfert = new ArrayList<Client>();
+    private HashMap<String, Client> lireClient() {
+        HashMap<String, Client> transfert = new HashMap<String, Client>();
         try {
             InputStream file = new FileInputStream("Client.itl");
             InputStream buffer = new BufferedInputStream(file);
             ObjectInput input = new ObjectInputStream(buffer);
-            transfert = (ArrayList<Client>) input.readObject();
+            transfert = (HashMap<String, Client>) input.readObject();
             input.close();
             buffer.close();
             file.close();
@@ -362,6 +372,7 @@ public class MainController {
         } catch (ClassNotFoundException ex) {
             mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
         }
+
         return transfert;
     }
 
