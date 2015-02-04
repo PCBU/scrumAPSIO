@@ -66,6 +66,9 @@ public class MainController {
         } else if (splitCommande[0].equals("listemissionsvacantes")) {
             listeMissionsVacantes();
 
+        } else if (splitCommande[0].equals("envoyermission")) {
+            envoyerMission(splitCommande);
+
         } else if (splitCommande[0].equals("listecommandes")) {
             listeCommandes();
 
@@ -186,6 +189,31 @@ public class MainController {
 
             default:
                 afficherSyntaxe(splitCommande[0]);
+        }
+    }
+
+    private void envoyerMission(String[] splitCommande) {
+
+        if(splitCommande.length == 3) {
+            if (missions.containsKey(splitCommande[1])){
+                if (missions.get(splitCommande[1]).isVaccante()){
+                    if (consultants.containsKey(splitCommande[2])) {
+                        Consultant consultantSend = consultants.get(splitCommande[2]);
+                        Mission missionSend = missions.get(splitCommande[1]);
+                        missionSend.setConsultant(consultantSend);
+                        missions.put(splitCommande[1], missionSend);
+                        mainView.afficher("Consultant envoyé en mission " + missionSend);
+                    } else {
+                        mainView.afficher("Le consultant n'existe pas");
+                    }
+                } else {
+                    mainView.afficher("Un consultant est déjà affecté à cette mission");
+                }
+            } else {
+                mainView.afficher("La mission n'existe pas");
+            }
+        } else {
+            afficherSyntaxe(splitCommande[0]);
         }
     }
 

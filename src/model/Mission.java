@@ -8,6 +8,10 @@ import java.util.Date;
 
 public class Mission {
 
+	public void setConsultant(Consultant consultant) {
+		this.consultant = consultant;
+	}
+
 	/**
 	 * Consultant unique associé à la mission
 	 */
