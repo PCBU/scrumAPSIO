@@ -9,6 +9,7 @@ import service.ConsultantService;
 import service.MissionService;
 import view.MainView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -24,11 +25,15 @@ public class MainController {
     private HashMap<String, Client> clients;
     private HashMap<String, Mission> missions;
 
+    private ArrayList<String> commandes;
+
     public MainController(MainView mainView) {
         super();
         this.mainView = mainView;
 
         consultants = ConsultantService.consultants();
+
+        this.commandes = new ArrayList<String>();
 
         this.consultants = consultants();
         this.missions = MissionService.tests(); //new HashMap<String, Mission>();
@@ -37,6 +42,8 @@ public class MainController {
 
     public void commande(String commande) {
         String[] splitCommande = commande.split(";");
+
+        commandes.add(commande);
 
         if (splitCommande[0].equals("listeconsultant")) {
             listeConsultant();
@@ -59,10 +66,21 @@ public class MainController {
         } else if (splitCommande[0].equals("listemissionsvacantes")) {
             listeMissionsVacantes();
 
+        } else if (splitCommande[0].equals("listecommandes")) {
+            listeCommandes();
+
         } else { //cas ou la commande n'est pas reconnue
             mainView.afficher("commande '" + commande + "' inconnue.");
         }
 
+    }
+
+    private void listeCommandes() {
+        mainView.afficher("Commandes effectuées :");
+
+        for (String commande : commandes) {
+            mainView.afficher(commande);
+        }
     }
 
     private void listeConsultant() {
