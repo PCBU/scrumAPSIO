@@ -204,18 +204,13 @@ public class MainController {
 
     private void retourMission(String[] splitCommande) {
 
-        if(splitCommande.length == 3) {
+        if(splitCommande.length == 2) {
             if (missions.containsKey(splitCommande[1])){
                 if (!missions.get(splitCommande[1]).isVaccante()){
-                    if (consultants.containsKey(splitCommande[2])) {
-
                         Mission missionSend = missions.get(splitCommande[1]);
                         missionSend.setConsultant(null);
                         missions.put(splitCommande[1], missionSend);
                         mainView.afficher("Consultant revenu de mission " + missionSend);
-                    } else {
-                        mainView.afficher("Le consultant n'existe pas");
-                    }
                 } else {
                     mainView.afficher("Aucun consultant affecté à cette mission");
                 }
@@ -239,7 +234,7 @@ public class MainController {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nenvoyermission;Intitulé de la mission;Nom du consultant");
 
         } else if (commande.equals("retourmission")) {
-            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nretourmission;Intitulé de la mission;Nom du consultant");
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nretourmission;Intitulé de la mission");
         }
     }
 }
