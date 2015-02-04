@@ -72,10 +72,22 @@ public class MainController {
         } else if (splitCommande[0].equals("listecommandes")) {
             listeCommandes();
 
+        } else if (splitCommande[0].equals("consultantsdisponibles")) {
+            consultantsDisponibles();
         } else { //cas ou la commande n'est pas reconnue
             mainView.afficher("commande '" + commande + "' inconnue.");
         }
 
+    }
+
+    private void consultantsDisponibles() {
+        if (!MissionService.consultantsDisponibles(this.consultants, this.missions).isEmpty()) {
+            mainView.afficher("Consultants disponibles :");
+            for(Map.Entry<String, Consultant> entry : MissionService.consultantsDisponibles(this.consultants, this.missions).entrySet()){
+                Consultant unConsultant = entry.getValue();
+                mainView.afficher(unConsultant.toString());
+            }
+        }
     }
 
     private void listeCommandes() {
