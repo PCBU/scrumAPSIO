@@ -6,7 +6,6 @@ import model.Mission;
 import org.joda.time.DateTime;
 import org.joda.time.IllegalFieldValueException;
 import org.joda.time.format.DateTimeFormatter;
-import service.ConsultantService;
 import service.MissionService;
 import view.MainView;
 
@@ -14,9 +13,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
-import static java.util.Optional.of;
 import static org.joda.time.format.DateTimeFormat.forPattern;
 import static service.ConsultantService.consultants;
 
@@ -270,22 +267,26 @@ public class MainController {
 
         switch (splitCommande.length) {
             case 6:
-                Optional<Consultant> consultantMission = ConsultantService.getFirstConsultantByNom(consultants, splitCommande[1]);
+                Consultant consultantMission = consultants.get(splitCommande[1]);
 
-                if (!consultantMission.isPresent()) {
-                    afficherSyntaxe(splitCommande[0]);
+                Client clientMission = clients.get(splitCommande[5]);
+
+                if (consultantMission == null) {
+                    mainView.afficher("Le consultant " + splitCommande[1] + " n'existe pas.");
+                    break;
+                } else if (clientMission == null) {
+                    mainView.afficher("Le client " + splitCommande[5] + " n'existe pas.");
                     break;
                 }
 
-                //Optional<Client> clientMission = ClientService.getFirstClientByNom(clients, splitCommande[5]);
-                Optional<Client> clientMission = of(new Client());
-
                 try {
-                    Mission mission = new Mission(consultantMission.get(),
+                    Mission mission = new Mission(
+                            consultantMission,
                             DateTime.parse(splitCommande[2], formatter),
                             DateTime.parse(splitCommande[3], formatter),
                             splitCommande[4],
-                            clientMission.get());
+                            clientMission
+                    );
 
                     missions.put(mission.getIntitule(), mission);
 
@@ -300,14 +301,21 @@ public class MainController {
                 break;
 
             case 5:
-                //Optional<Client> clientMission = ClientService.getFirstClientByNom(consultants, splitCommande[5]);
-                Optional<Client> client = of(new Client());
+                Client client = clients.get(splitCommande[5]);
+
+                if (client == null) {
+                    mainView.afficher("Le client " + splitCommande[5] + " n'existe pas.");
+                    break;
+                }
 
                 try {
-                    Mission nouvelleMission = new Mission(DateTime.parse(splitCommande[1], formatter),
+                    Mission nouvelleMission = new Mission(
+                            DateTime.parse(splitCommande[1], formatter),
                             DateTime.parse(splitCommande[2]),
                             splitCommande[3],
-                            client.get());
+                            client
+                    );
+
 
                     missions.put(nouvelleMission.getIntitule(), nouvelleMission);
 
