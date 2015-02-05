@@ -99,8 +99,47 @@ public class MainController {
         } else if (splitCommande[0].equals("consultantsdisponiblesdate")) {
             consultantsDisponiblesDateT(splitCommande);
 
+        } else if (splitCommande[0].equals("disposconsultant")) {
+            disposConsultant(splitCommande);
+
         } else { //cas ou la commande n'est pas reconnue
             mainView.afficher("commande '" + commande + "' inconnue.");
+        }
+    }
+
+    private void disposConsultant(String[] commande) {
+
+        if (commande.length < 2) {
+            afficherSyntaxe("disposconsultant");
+        } else {
+
+            Consultant consultant = consultants.get(commande[1]);
+
+            if (consultant == null) {
+                mainView.afficher("Le consultant" + consultant.getNom() + "n'existe pas.");
+            } else {
+                ArrayList<DateTime[]> dispos = new ArrayList<DateTime[]>();
+
+                for (Map.Entry<String, Mission> entry : missions.entrySet()) {
+                    Mission mission = entry.getValue();
+
+                    if (mission.getConsultant() == consultant) {
+                        DateTime[] dates = {mission.getDebut(), mission.getFin()};
+
+                        dispos.add(dates);
+                    }
+                }
+
+                if (dispos.isEmpty()) {
+                    mainView.afficher("Le consultant " + consultant.getNom() + " est actuellement totalement disponible.");
+                } else {
+                    mainView.afficher("Le consultant " + consultant.getNom() + " est indisponible entre les dates suivantes :");
+
+                    for (DateTime[] dates : dispos) {
+                        mainView.afficher("Du " + dates[0] + " au " + dates[1]);
+                    }
+                }
+            }
         }
     }
 
@@ -332,6 +371,9 @@ public class MainController {
 
         } else if (commande.equals("consultantsdisponiblesdate")) {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nconsultantsdisponiblesdate;Date jjmmaaaa");
+
+        } else if (commande.equals("disposconsultant")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\ndisposconsultant;Nom consultant");
 
         } else if (commande.equals("date")) {
             mainView.afficher("Format de date incorrect. Le format valide est jjmmaaaa.\nPour le 1er mars 2015, la syntaxe est : 01032015");
