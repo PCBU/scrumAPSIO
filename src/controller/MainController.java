@@ -42,7 +42,7 @@ public class MainController {
             this.consultants = consultants();
         }
 
-        f = new File("cission.itl");
+        f = new File("mission.itl");
         if (f.exists()) {
             this.missions = lireMission();
         } else {
@@ -98,6 +98,12 @@ public class MainController {
 
         } else if (splitCommande[0].equals("consultantsdisponiblesdate")) {
             consultantsDisponiblesDateT(splitCommande);
+
+        } else if(splitCommande[0].equals("listemission")){
+          listeMission();
+
+        } else if(splitCommande[0].equals("listeclient")){
+          listeClient();
 
         } else if (splitCommande[0].equals("disposconsultant")) {
             disposConsultant(splitCommande);
@@ -189,6 +195,20 @@ public class MainController {
 
         for (Map.Entry<String, Consultant> entry : consultants.entrySet()) {
             mainView.afficher(entry.getValue().toString());
+        }
+    }
+
+    private void listeMission(){
+        mainView.afficher("Liste des missions :");
+        for (Map.Entry<String, Mission> entry : missions.entrySet()){
+            mainView.afficher(entry.getValue().toString());
+        }
+    }
+
+    private void listeClient(){
+        mainView.afficher("Liste des clients :");
+        for (Map.Entry<String, Client> entry : clients.entrySet()){
+            mainView.afficher((entry.getValue().toString()));
         }
     }
 

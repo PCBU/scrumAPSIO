@@ -101,7 +101,8 @@ public class MainView{
 		mainFrame.pack();
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setSize(800, 400);
-		mainFrame.setVisible(true);	
+		mainFrame.setVisible(true);
+		mainFrame.setLocationRelativeTo(null);
 	}
 
 	/**
