@@ -122,14 +122,14 @@ public class MainController {
             Consultant consultant = consultants.get(commande[1]);
 
             if (consultant == null) {
-                mainView.afficher("Le consultant " + consultant.getNom() + "n'existe pas.");
+                mainView.afficher("Le consultant " + commande[1] + "n'existe pas.");
             } else {
                 ArrayList<DateTime[]> dispos = new ArrayList<DateTime[]>();
 
                 for (Map.Entry<String, Mission> entry : missions.entrySet()) {
                     Mission mission = entry.getValue();
 
-                    if (mission.getConsultant() == consultant) {
+                    if (mission.getConsultant().getNom().equals(consultant.getNom())) {
                         DateTime[] dates = {mission.getDebut(), mission.getFin()};
 
                         dispos.add(dates);
