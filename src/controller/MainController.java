@@ -163,7 +163,6 @@ public class MainController {
 
         if (commande.length >= 2) {
             try {
-
                 DateTime parsedDate = DateTime.parse(commande[1], forPattern("ddMMyyyy"));
 
                 if (!MissionService.consultantsDisponiblesPourDate(this.consultants, this.missions, parsedDate).isEmpty()) {
