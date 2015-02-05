@@ -116,7 +116,7 @@ public class MainController {
             Consultant consultant = consultants.get(commande[1]);
 
             if (consultant == null) {
-                mainView.afficher("Le consultant" + consultant.getNom() + "n'existe pas.");
+                mainView.afficher("Le consultant " + consultant.getNom() + "n'existe pas.");
             } else {
                 ArrayList<DateTime[]> dispos = new ArrayList<DateTime[]>();
 
