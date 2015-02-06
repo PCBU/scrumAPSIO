@@ -6,6 +6,7 @@ import model.Mission;
 import org.joda.time.DateTime;
 import org.joda.time.IllegalFieldValueException;
 import org.joda.time.format.DateTimeFormatter;
+import service.ConsultantService;
 import service.MissionService;
 import view.MainView;
 
@@ -147,9 +148,9 @@ public class MainController {
     }
 
     private void consultantsDisponibles() {
-        if (!MissionService.consultantsDisponibles(this.consultants, this.missions).isEmpty()) {
+        if (!ConsultantService.consultantsDisponibles(this.consultants, this.missions).isEmpty()) {
             mainView.afficher("Consultants disponibles :");
-            for(Map.Entry<String, Consultant> entry : MissionService.consultantsDisponibles(this.consultants, this.missions).entrySet()){
+            for(Map.Entry<String, Consultant> entry : ConsultantService.consultantsDisponibles(this.consultants, this.missions).entrySet()){
                 Consultant unConsultant = entry.getValue();
                 mainView.afficher(unConsultant.toString());
             }
@@ -162,10 +163,10 @@ public class MainController {
             try {
                 DateTime parsedDate = DateTime.parse(commande[1], forPattern("ddMMyyyy"));
 
-                if (!MissionService.consultantsDisponiblesPourDate(this.consultants, this.missions, parsedDate).isEmpty()) {
+                if (!ConsultantService.consultantsDisponiblesPourDate(this.consultants, this.missions, parsedDate).isEmpty()) {
 
                     mainView.afficher("Consultants disponibles pour la date + " + parsedDate + " :");
-                    for (Map.Entry<String, Consultant> entry : MissionService.consultantsDisponibles(this.consultants, this.missions).entrySet()) {
+                    for (Map.Entry<String, Consultant> entry : ConsultantService.consultantsDisponibles(this.consultants, this.missions).entrySet()) {
                         Consultant unConsultant = entry.getValue();
                         mainView.afficher(unConsultant.toString());
                     }
