@@ -8,7 +8,6 @@ import org.joda.time.DateTime;
 import org.joda.time.IllegalFieldValueException;
 import org.joda.time.format.DateTimeFormatter;
 import service.ConsultantService;
-import service.MissionService;
 import view.MainView;
 
 import java.io.*;
@@ -120,6 +119,13 @@ public class MainController {
                 loggedIn = "";
                 mainView.afficher("Vous êtes maintenant déconnecté.");
 
+            } else if (splitCommande[0].equals("ajoutcompetence")) {
+                nouvelleComp(splitCommande);
+
+            } else if (splitCommande[0].equals("suprcompetence")) {
+                suprComp(splitCommande);
+
+
             } else { //cas ou la commande n'est pas reconnue
                 mainView.afficher("commande '" + commande + "' inconnue.");
             }
@@ -139,7 +145,7 @@ public class MainController {
                 if (splitCommande[1].equals(user.getKey()) && splitCommande[2].equals(user.getValue())) {
                     loggedIn = "Admin";//getUserStatus(user.getKey());
                     mainView.afficher("Vous êtes maintenant connecté en tant que " + user.getKey()
-                                    + "\nPour vous déconnecter, utilisez la commande 'deconnexion'.");
+                            + "\nPour vous déconnecter, utilisez la commande 'deconnexion'.");
                 }
             }
         }
@@ -184,7 +190,7 @@ public class MainController {
     private void consultantsDisponibles() {
         if (!ConsultantService.consultantsDisponibles(this.consultants, this.missions).isEmpty()) {
             mainView.afficher("Consultants disponibles :");
-            for(Map.Entry<String, Consultant> entry : ConsultantService.consultantsDisponibles(this.consultants, this.missions).entrySet()){
+            for (Map.Entry<String, Consultant> entry : ConsultantService.consultantsDisponibles(this.consultants, this.missions).entrySet()) {
                 Consultant unConsultant = entry.getValue();
                 mainView.afficher(unConsultant.toString());
             }
@@ -233,16 +239,16 @@ public class MainController {
         }
     }
 
-    private void listeMission(){
+    private void listeMission() {
         mainView.afficher("Liste des missions :");
-        for (Map.Entry<String, Mission> entry : missions.entrySet()){
+        for (Map.Entry<String, Mission> entry : missions.entrySet()) {
             mainView.afficher(entry.getValue().toString());
         }
     }
 
-    private void listeClient(){
+    private void listeClient() {
         mainView.afficher("Liste des clients :");
-        for (Map.Entry<String, Client> entry : clients.entrySet()){
+        for (Map.Entry<String, Client> entry : clients.entrySet()) {
             mainView.afficher((entry.getValue().toString()));
         }
     }
@@ -375,9 +381,9 @@ public class MainController {
 
     private void envoyerMission(String[] splitCommande) {
 
-        if(splitCommande.length == 3) {
-            if (missions.containsKey(splitCommande[1])){
-                if (missions.get(splitCommande[1]).isVaccante()){
+        if (splitCommande.length == 3) {
+            if (missions.containsKey(splitCommande[1])) {
+                if (missions.get(splitCommande[1]).isVaccante()) {
                     if (consultants.containsKey(splitCommande[2])) {
                         Consultant consultantSend = consultants.get(splitCommande[2]);
                         Mission missionSend = missions.get(splitCommande[1]);
@@ -400,13 +406,13 @@ public class MainController {
 
     private void retourMission(String[] splitCommande) {
 
-        if(splitCommande.length == 2) {
-            if (missions.containsKey(splitCommande[1])){
-                if (!missions.get(splitCommande[1]).isVaccante()){
-                        Mission missionSend = missions.get(splitCommande[1]);
-                        missionSend.setConsultant(null);
-                        missions.put(splitCommande[1], missionSend);
-                        mainView.afficher("Consultant revenu de mission " + missionSend);
+        if (splitCommande.length == 2) {
+            if (missions.containsKey(splitCommande[1])) {
+                if (!missions.get(splitCommande[1]).isVaccante()) {
+                    Mission missionSend = missions.get(splitCommande[1]);
+                    missionSend.setConsultant(null);
+                    missions.put(splitCommande[1], missionSend);
+                    mainView.afficher("Consultant revenu de mission " + missionSend);
                 } else {
                     mainView.afficher("Aucun consultant affecté à cette mission");
                 }
@@ -449,6 +455,10 @@ public class MainController {
 
         } else if (commande.equals("notloggedin")) {
             mainView.afficher("Vous n'êtes actuellement pas connecté.\nPour remédier à cela, tapez la commande login;Identifiant;Mot de passe");
+        } else if (commande.equals("ajoutcompetence")) {
+            mainView.afficher("Format de date incorrect. Le format valide est ajoutcompetence;consultant;competance");
+        } else if (commande.equals("suprcompetence")) {
+            mainView.afficher("Format de date incorrect. Le format valide est suprcompetence;consultant;competance");
         }
     }
 
@@ -563,5 +573,26 @@ public class MainController {
         }
 
         return transfert;
+    }
+
+    private void nouvelleComp(String[] commande) {
+        if (commande.length == 3) {
+            consultants.get(commande[1]).ajouterCompetence(commande[2]);
+            enregistrerListeConsultant();
+            mainView.afficher("Compétence : " + commande[2] + " ajouté.");
+        } else {
+            afficherSyntaxe(commande[0]);
+        }
+    }
+
+    private void suprComp(String[] commande) {
+        if (commande.length == 3) {
+            consultants.get(commande[1]).retirerCompetence(commande[2]);
+            enregistrerListeConsultant();
+            mainView.afficher("Compétence : " + commande[2] + " supprimer.");
+
+        } else {
+            afficherSyntaxe(commande[0]);
+        }
     }
 }

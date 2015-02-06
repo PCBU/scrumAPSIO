@@ -62,15 +62,15 @@ public class Consultant implements Serializable {
 	}
 
 	public  void retirerCompetence(String comp){
-		for(String val : competences){
+
 			Iterator<String> iterator = competences.iterator();
 			while (iterator.hasNext()){
 				String a = iterator.next();
-				if(a == comp){
+				if(a.equals(comp)){
 					iterator.remove();
 				}
 			}
-		}
+
 	}
 	@Override
 	public String toString() {
