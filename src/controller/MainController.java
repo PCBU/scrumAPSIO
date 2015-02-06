@@ -13,6 +13,7 @@ import view.MainView;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import static org.joda.time.format.DateTimeFormat.forPattern;
@@ -22,6 +23,7 @@ public class MainController {
     private MainView mainView;
 
     private String loggedIn = "";
+    private HashMap<String, ArrayList<String>> managers;
 
     private HashMap<String, Consultant> consultants;
     private HashMap<String, Client> clients;
@@ -34,6 +36,13 @@ public class MainController {
         this.mainView = mainView;
 
         this.commandes = new ArrayList<String>();
+        this.managers = new HashMap<String, ArrayList<String>>();
+
+        ArrayList<String> listeConsultants = new ArrayList<String>();
+        listeConsultants.add("Moulin");
+        listeConsultants.add("Martin");
+
+        this.managers.put("roger", listeConsultants); //TODO remove when database is available
 
         File f = new File("Consultant.itl");
         if (f.exists()) {
@@ -139,11 +148,12 @@ public class MainController {
         } else {
             ArrayList<Pair<String, String>> listeUsers = new ArrayList<Pair<String, String>>(); //TODO fetch from database once available
 
-            listeUsers.add(new Pair<String, String>("login", "password")); //TODO remove when database is available
+            listeUsers.add(new Pair<String, String>("directeur", "password")); //TODO remove when database is available
+            listeUsers.add(new Pair<String, String>("roger", "password")); //TODO remove when database is available
 
             for (Pair<String, String> user : listeUsers) {
                 if (splitCommande[1].equals(user.getKey()) && splitCommande[2].equals(user.getValue())) {
-                    loggedIn = "Admin";//getUserStatus(user.getKey());
+                    loggedIn = splitCommande[1];//getUserStatus(user.getKey());
                     mainView.afficher("Vous êtes maintenant connecté en tant que " + user.getKey()
                             + "\nPour vous déconnecter, utilisez la commande 'deconnexion'.");
                 }
@@ -162,25 +172,42 @@ public class MainController {
             if (consultant == null) {
                 mainView.afficher("Le consultant " + commande[1] + "n'existe pas.");
             } else {
-                ArrayList<DateTime[]> dispos = new ArrayList<DateTime[]>();
+                if (loggedIn.equals("directeur")) {
 
-                for (Map.Entry<String, Mission> entry : missions.entrySet()) {
-                    Mission mission = entry.getValue();
-
-                    if (mission.getConsultant().getNom().equals(consultant.getNom())) {
-                        DateTime[] dates = {mission.getDebut(), mission.getFin()};
-
-                        dispos.add(dates);
-                    }
-                }
-
-                if (dispos.isEmpty()) {
-                    mainView.afficher("Le consultant " + consultant.getNom() + " est actuellement totalement disponible.");
                 } else {
-                    mainView.afficher("Le consultant " + consultant.getNom() + " est indisponible entre les dates suivantes :");
+                    boolean isFound = false;
 
-                    for (DateTime[] dates : dispos) {
-                        mainView.afficher("Du " + dates[0] + " au " + dates[1]);
+                    for (Iterator<String> iterator = managers.get(loggedIn).iterator(); iterator.hasNext() && !isFound; ) {
+                        String consultantDuManager = iterator.next();
+                        if (consultant.getNom().equals(consultantDuManager)) {
+                            isFound = true;
+                        }
+                    }
+
+                    if (isFound) {
+                        ArrayList<DateTime[]> dispos = new ArrayList<DateTime[]>();
+
+                        for (Map.Entry<String, Mission> entry : missions.entrySet()) {
+                            Mission mission = entry.getValue();
+
+                            if (mission.getConsultant().getNom().equals(consultant.getNom())) {
+                                DateTime[] dates = {mission.getDebut(), mission.getFin()};
+
+                                dispos.add(dates);
+                            }
+                        }
+
+                        if (dispos.isEmpty()) {
+                            mainView.afficher("Le consultant " + consultant.getNom() + " est actuellement totalement disponible.");
+                        } else {
+                            mainView.afficher("Le consultant " + consultant.getNom() + " est indisponible entre les dates suivantes :");
+
+                            for (DateTime[] dates : dispos) {
+                                mainView.afficher("Du " + dates[0] + " au " + dates[1]);
+                            }
+                        }
+                    } else {
+                        mainView.afficher("Vous n'avez pas de visibilité sur ce consultant.");
                     }
                 }
             }
@@ -189,10 +216,23 @@ public class MainController {
 
     private void consultantsDisponibles() {
         if (!ConsultantService.consultantsDisponibles(this.consultants, this.missions).isEmpty()) {
-            mainView.afficher("Consultants disponibles :");
-            for (Map.Entry<String, Consultant> entry : ConsultantService.consultantsDisponibles(this.consultants, this.missions).entrySet()) {
-                Consultant unConsultant = entry.getValue();
-                mainView.afficher(unConsultant.toString());
+
+            if (loggedIn.equals("directeur")) {
+                mainView.afficher("Consultants disponibles :");
+                for (Map.Entry<String, Consultant> entry : ConsultantService.consultantsDisponibles(this.consultants, this.missions).entrySet()) {
+                    Consultant unConsultant = entry.getValue();
+                    mainView.afficher(unConsultant.toString());
+                }
+            } else {
+                mainView.afficher("Consultants disponibles :");
+                for (Map.Entry<String, Consultant> entry : ConsultantService.consultantsDisponibles(this.consultants, this.missions).entrySet()) {
+                    for (String consultant : managers.get(loggedIn)) {
+                        if (entry.getValue().getNom().equals(consultant)) {
+                            Consultant unConsultant = entry.getValue();
+                            mainView.afficher(unConsultant.toString());
+                        }
+                    }
+                }
             }
         }
     }
@@ -234,8 +274,18 @@ public class MainController {
     private void listeConsultant() {
         mainView.afficher("Liste des consultants :");
 
-        for (Map.Entry<String, Consultant> entry : consultants.entrySet()) {
-            mainView.afficher(entry.getValue().toString());
+        if (loggedIn.equals("directeur")) {
+            for (Map.Entry<String, Consultant> entry : consultants.entrySet()) {
+                mainView.afficher(entry.getValue().toString());
+            }
+        } else {
+            for (Map.Entry<String, Consultant> entry : consultants.entrySet()) {
+                for (String consultant : managers.get(loggedIn)) {
+                    if (entry.getValue().getNom().equals(consultant)) {
+                        mainView.afficher(entry.getValue().toString());
+                    }
+                }
+            }
         }
     }
 
@@ -346,10 +396,10 @@ public class MainController {
                 break;
 
             case 5:
-                Client client = clients.get(splitCommande[5]);
+                Client client = clients.get(splitCommande[4]);
 
                 if (client == null) {
-                    mainView.afficher("Le client " + splitCommande[5] + " n'existe pas.");
+                    mainView.afficher("Le client " + splitCommande[4] + " n'existe pas.");
                     break;
                 }
 
@@ -384,14 +434,39 @@ public class MainController {
         if (splitCommande.length == 3) {
             if (missions.containsKey(splitCommande[1])) {
                 if (missions.get(splitCommande[1]).isVaccante()) {
-                    if (consultants.containsKey(splitCommande[2])) {
-                        Consultant consultantSend = consultants.get(splitCommande[2]);
-                        Mission missionSend = missions.get(splitCommande[1]);
-                        missionSend.setConsultant(consultantSend);
-                        missions.put(splitCommande[1], missionSend);
-                        mainView.afficher("Consultant envoyé en mission " + missionSend);
+                    if (loggedIn.equals("directeur")) {
+                        if (consultants.containsKey(splitCommande[2])) {
+                            Consultant consultantSend = consultants.get(splitCommande[2]);
+                            Mission missionSend = missions.get(splitCommande[1]);
+                            missionSend.setConsultant(consultantSend);
+                            missions.put(splitCommande[1], missionSend);
+                            mainView.afficher("Consultant envoyé en mission " + missionSend);
+                        } else {
+                            mainView.afficher("Le consultant n'existe pas");
+                        }
                     } else {
-                        mainView.afficher("Le consultant n'existe pas");
+                        boolean isFound = false;
+
+                        for (Iterator<String> iterator = managers.get(loggedIn).iterator(); iterator.hasNext() && !isFound; ) {
+                            String consultantDuManager = iterator.next();
+                            if (splitCommande[2].equals(consultantDuManager)) {
+                                isFound = true;
+                            }
+                        }
+
+                        if (isFound) {
+                            if (consultants.containsKey(splitCommande[2])) {
+                                Consultant consultantSend = consultants.get(splitCommande[2]);
+                                Mission missionSend = missions.get(splitCommande[1]);
+                                missionSend.setConsultant(consultantSend);
+                                missions.put(splitCommande[1], missionSend);
+                                mainView.afficher("Consultant envoyé en mission " + missionSend);
+                            } else {
+                                mainView.afficher("Le consultant n'existe pas");
+                            }
+                        } else {
+                            mainView.afficher("Vous n'avez pas de visibilité sur ce consultant.");
+                        }
                     }
                 } else {
                     mainView.afficher("Un consultant est déjà affecté à cette mission");
@@ -408,13 +483,40 @@ public class MainController {
 
         if (splitCommande.length == 2) {
             if (missions.containsKey(splitCommande[1])) {
-                if (!missions.get(splitCommande[1]).isVaccante()) {
-                    Mission missionSend = missions.get(splitCommande[1]);
-                    missionSend.setConsultant(null);
-                    missions.put(splitCommande[1], missionSend);
-                    mainView.afficher("Consultant revenu de mission " + missionSend);
+
+                if (loggedIn.equals("directeur")) {
+                    if (!missions.get(splitCommande[1]).isVaccante()) {
+                        Mission missionSend = missions.get(splitCommande[1]);
+                        missionSend.setConsultant(null);
+                        missions.put(splitCommande[1], missionSend);
+                        mainView.afficher("Consultant revenu de mission " + missionSend);
+                        enregistrerListeMission();
+                    } else {
+                        mainView.afficher("Aucun consultant affecté à cette mission");
+                    }
                 } else {
-                    mainView.afficher("Aucun consultant affecté à cette mission");
+                    boolean isFound = false;
+
+                    for (Iterator<String> iterator = managers.get(loggedIn).iterator(); iterator.hasNext() && !isFound; ) {
+                        String consultantDuManager = iterator.next();
+                        if (missions.get(splitCommande[1]).getConsultant().getNom().equals(consultantDuManager)) {
+                            isFound = true;
+                        }
+                    }
+
+                    if (isFound) {
+                        if (!missions.get(splitCommande[1]).isVaccante()) {
+                            Mission missionSend = missions.get(splitCommande[1]);
+                            missionSend.setConsultant(null);
+                            missions.put(splitCommande[1], missionSend);
+                            mainView.afficher("Consultant revenu de mission " + missionSend);
+                            enregistrerListeMission();
+                        } else {
+                            mainView.afficher("Aucun consultant affecté à cette mission");
+                        }
+                    } else {
+                        mainView.afficher("Vous n'avez pas de visibilité sur ce consultant.");
+                    }
                 }
             } else {
                 mainView.afficher("La mission n'existe pas");
@@ -439,7 +541,7 @@ public class MainController {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nenvoyermission;Intitulé de la mission;Nom du consultant");
 
         } else if (commande.equals("retourmission")) {
-            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nenvoyermission;Libellé de la mission;Nom du consultant");
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nretourmission;Libellé de la mission");
 
         } else if (commande.equals("consultantsdisponiblesdate")) {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nconsultantsdisponiblesdate;Date jjmmaaaa");
@@ -478,7 +580,6 @@ public class MainController {
     }
 
     private void enregistrerListeClient() {
-
         try {
             OutputStream file = new FileOutputStream("Client.itl");
             OutputStream buffer = new BufferedOutputStream(file);
@@ -490,7 +591,6 @@ public class MainController {
         } catch (IOException ex) {
             mainView.afficher("Certaines données n'ont pas pu être enregistrées, il se peut que des données soient perdues.");
         }
-
     }
 
     private void enregistrerListeMission() {
