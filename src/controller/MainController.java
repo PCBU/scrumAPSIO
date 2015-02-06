@@ -468,8 +468,10 @@ public class MainController {
 
         } catch (IOException ex) {
             mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- IOException.");
+            this.consultants = new HashMap<String, Consultant>();
         } catch (ClassNotFoundException ex) {
             mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
+            this.consultants = new HashMap<String, Consultant>();
         }
 
         return transfert;
@@ -510,8 +512,10 @@ public class MainController {
 
         } catch (IOException ex) {
             mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- IOException.");
+            this.clients = new HashMap<String, Client>();
         } catch (ClassNotFoundException ex) {
             mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
+            this.clients = new HashMap<String, Client>();
         }
 
         return transfert;
