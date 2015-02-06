@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.util.Pair;
 import model.Client;
 import model.Consultant;
 import model.Mission;
@@ -19,6 +20,8 @@ import static service.ConsultantService.consultants;
 
 public class MainController {
     private MainView mainView;
+
+    private String loggedIn = "";
 
     private HashMap<String, Consultant> consultants;
     private HashMap<String, Client> clients;
@@ -52,61 +55,92 @@ public class MainController {
         } else {
             this.clients = new HashMap<String, Client>();
         }
-
     }
 
     public void commande(String commande) {
         String[] splitCommande = commande.split(";");
 
-        commandes.add(commande);
 
-        if (splitCommande[0].equals("listeconsultant")) {
-            listeConsultant();
+        if (loggedIn.equals("")) {
+            if (splitCommande[0].equals("login")) {
+                login(splitCommande);
+            } else {
+                afficherSyntaxe("notloggedin");
+            }
+        } else {
+            commandes.add(commande);
 
-        } else if (splitCommande[0].equals("creerclient")) {
-            creerClient(splitCommande);
+            if (splitCommande[0].equals("listeconsultant")) {
+                listeConsultant();
 
-        } else if (splitCommande[0].equals("creerconsultant")) {
-            creerConsultant(splitCommande);
+            } else if (splitCommande[0].equals("creerclient")) {
+                creerClient(splitCommande);
 
-        } else if (splitCommande[0].equals("listeconsultantlibre")) {
-            mainView.afficher("Liste des consultants actuellement libres :");
+            } else if (splitCommande[0].equals("creerconsultant")) {
+                creerConsultant(splitCommande);
 
-        } else if (splitCommande[0].equals("clear")) {
-            mainView.effacer();
+            } else if (splitCommande[0].equals("listeconsultantlibre")) {
+                mainView.afficher("Liste des consultants actuellement libres :");
 
-        } else if (splitCommande[0].equals("creermission")) {
-            creerMission(splitCommande);
+            } else if (splitCommande[0].equals("clear")) {
+                mainView.effacer();
 
-        } else if (splitCommande[0].equals("listemissionsvacantes")) {
-            listeMissionsVacantes();
+            } else if (splitCommande[0].equals("creermission")) {
+                creerMission(splitCommande);
 
-        } else if (splitCommande[0].equals("envoyermission")) {
-            envoyerMission(splitCommande);
+            } else if (splitCommande[0].equals("listemissionsvacantes")) {
+                listeMissionsVacantes();
 
-        } else if (splitCommande[0].equals("retourmission")) {
-            retourMission(splitCommande);
+            } else if (splitCommande[0].equals("envoyermission")) {
+                envoyerMission(splitCommande);
 
-        } else if (splitCommande[0].equals("listecommandes")) {
-            listeCommandes();
+            } else if (splitCommande[0].equals("retourmission")) {
+                retourMission(splitCommande);
 
-        } else if (splitCommande[0].equals("consultantsdisponibles")) {
-            consultantsDisponibles();
+            } else if (splitCommande[0].equals("listecommandes")) {
+                listeCommandes();
 
-        } else if (splitCommande[0].equals("consultantsdisponiblesdate")) {
-            consultantsDisponiblesDateT(splitCommande);
+            } else if (splitCommande[0].equals("consultantsdisponibles")) {
+                consultantsDisponibles();
 
-        } else if(splitCommande[0].equals("listemission")){
-          listeMission();
+            } else if (splitCommande[0].equals("consultantsdisponiblesdate")) {
+                consultantsDisponiblesDateT(splitCommande);
 
-        } else if(splitCommande[0].equals("listeclient")){
-          listeClient();
+            } else if (splitCommande[0].equals("listemission")) {
+                listeMission();
 
-        } else if (splitCommande[0].equals("disposconsultant")) {
-            disposConsultant(splitCommande);
+            } else if (splitCommande[0].equals("listeclient")) {
+                listeClient();
 
-        } else { //cas ou la commande n'est pas reconnue
-            mainView.afficher("commande '" + commande + "' inconnue.");
+            } else if (splitCommande[0].equals("disposconsultant")) {
+                disposConsultant(splitCommande);
+
+            } else if (splitCommande[0].equals("deconnexion")) {
+                loggedIn = "";
+                mainView.afficher("Vous êtes maintenant déconnecté.");
+
+            } else { //cas ou la commande n'est pas reconnue
+                mainView.afficher("commande '" + commande + "' inconnue.");
+            }
+        }
+    }
+
+    private void login(String[] splitCommande) {
+
+        if (splitCommande.length != 3) {
+            afficherSyntaxe(splitCommande[0]);
+        } else {
+            ArrayList<Pair<String, String>> listeUsers = new ArrayList<Pair<String, String>>(); //TODO fetch from database once available
+
+            listeUsers.add(new Pair<String, String>("login", "password")); //TODO remove when database is available
+
+            for (Pair<String, String> user : listeUsers) {
+                if (splitCommande[1].equals(user.getKey()) && splitCommande[2].equals(user.getValue())) {
+                    loggedIn = "Admin";//getUserStatus(user.getKey());
+                    mainView.afficher("Vous êtes maintenant connecté en tant que " + user.getKey()
+                                    + "\nPour vous déconnecter, utilisez la commande 'deconnexion'.");
+                }
+            }
         }
     }
 
@@ -158,7 +192,7 @@ public class MainController {
 
     private void consultantsDisponiblesDateT(String[] commande) {
 
-        if (commande.length >= 2) {
+        if (commande.length == 2) {
             try {
                 DateTime parsedDate = DateTime.parse(commande[1], forPattern("ddMMyyyy"));
 
@@ -169,9 +203,13 @@ public class MainController {
                         Consultant unConsultant = entry.getValue();
                         mainView.afficher(unConsultant.toString());
                     }
+                } else {
+                    mainView.afficher("Aucun consultant n'est disponible pour cette date.");
                 }
             } catch (IllegalFieldValueException e) {
                 afficherSyntaxe("date");
+            } catch (IllegalArgumentException e) {
+                afficherSyntaxe(commande[0]);
             }
         } else {
             afficherSyntaxe(commande[0]);
@@ -402,9 +440,14 @@ public class MainController {
         } else if (commande.equals("disposconsultant")) {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\ndisposconsultant;Nom consultant");
 
+        } else if (commande.equals("login")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nlogin;Identifiant;Mot de passe");
+
         } else if (commande.equals("date")) {
             mainView.afficher("Format de date incorrect. Le format valide est jjmmaaaa.\nPour le 1er mars 2015, la syntaxe est : 01032015");
 
+        } else if (commande.equals("notloggedin")) {
+            mainView.afficher("Vous n'êtes actuellement pas connecté.\nPour remédier à cela, tapez la commande login;Identifiant;Mot de passe");
         }
     }
 
@@ -467,9 +510,9 @@ public class MainController {
             file.close();
 
         } catch (IOException ex) {
-            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- IOException.");
+            mainView.afficher("Certaines données n'ont pas pus être lues, il peut manquer certaines informations.");
         } catch (ClassNotFoundException ex) {
-            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
+            mainView.afficher("Certaines données n'ont pas pus être lues, il peut manquer certaines informations.");
         }
 
         return transfert;
@@ -487,9 +530,9 @@ public class MainController {
             file.close();
 
         } catch (IOException ex) {
-            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- IOException.");
+            mainView.afficher("Certaines données n'ont pas pus être lues, il peut manquer certaines informations.");
         } catch (ClassNotFoundException ex) {
-            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
+            mainView.afficher("Certaines données n'ont pas pus être lues, il peut manquer certaines informations.");
         }
 
         return transfert;
@@ -507,9 +550,9 @@ public class MainController {
             file.close();
 
         } catch (IOException ex) {
-            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- IOException.");
+            mainView.afficher("Certaines données n'ont pas pus être lues, il peut manquer certaines informations.");
         } catch (ClassNotFoundException ex) {
-            mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
+            mainView.afficher("Certaines données n'ont pas pus être lues, il peut manquer certaines informations.");
         }
 
         return transfert;
