@@ -1,12 +1,15 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Consultant implements Serializable {
 	private String nom;
 	private String prenom;
 	private String adresse;
 	private String telephone;
+	private ArrayList<String> comptence;
 	
 	public Consultant() {
 		super();
@@ -19,6 +22,7 @@ public class Consultant implements Serializable {
 		this.prenom = prenom;
 		this.adresse = adresse;
 		this.telephone = telephone;
+		this.comptence = new ArrayList<String>();
 	}
 
 	public String getNom() {
@@ -53,9 +57,24 @@ public class Consultant implements Serializable {
 		this.telephone = telephone;
 	}
 
+	public void ajouterCompetence(String comp) {
+		comptence.add(comp);
+	}
+
+	public  void retirerCompetence(String comp){
+		for(String val : comptence){
+			Iterator<String> iterator = comptence.iterator();
+			while (iterator.hasNext()){
+				String a = iterator.next();
+				if(a == comp){
+					iterator.remove();
+				}
+			}
+		}
+	}
 	@Override
 	public String toString() {
 		return "Consultant [nom=" + nom + ", prenom=" + prenom + ", adresse="
-				+ adresse + ", telephone=" + telephone + "]";
+				+ adresse + ", telephone=" + telephone + "Liste compétence" + comptence + "]";
 	}			
 }

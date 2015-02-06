@@ -32,21 +32,21 @@ public class MainController {
 
         this.commandes = new ArrayList<String>();
 
-        File f = new File("consultant.itl");
+        File f = new File("Consultant.itl");
         if (f.exists()) {
             this.consultants = lireConsultant();
         } else {
             this.consultants = consultants();
         }
 
-        f = new File("mission.itl");
+        f = new File("Mission.itl");
         if (f.exists()) {
             this.missions = lireMission();
         } else {
             this.missions = new HashMap<String, Mission>();
         }
 
-        f = new File("client.itl");
+        f = new File("Client.itl");
         if (f.exists()) {
             this.clients = lireClient();
         } else {
@@ -488,8 +488,10 @@ public class MainController {
 
         } catch (IOException ex) {
             mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- IOException.");
+            this.missions = new HashMap<String, Mission>();
         } catch (ClassNotFoundException ex) {
             mainView.afficher("Certaines données n'on pas pus être lue, il peut manquer certaine information--- ClassNotFoundException");
+            this.missions = new HashMap<String, Mission>();
         }
 
         return transfert;
