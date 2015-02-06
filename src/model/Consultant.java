@@ -9,7 +9,7 @@ public class Consultant implements Serializable {
 	private String prenom;
 	private String adresse;
 	private String telephone;
-	private ArrayList<String> comptences;
+	private ArrayList<String> competences;
 	
 	public Consultant() {
 		super();
@@ -22,7 +22,7 @@ public class Consultant implements Serializable {
 		this.prenom = prenom;
 		this.adresse = adresse;
 		this.telephone = telephone;
-		this.comptences = new ArrayList<String>();
+		this.competences = new ArrayList<String>();
 	}
 
 	public String getNom() {
@@ -58,12 +58,12 @@ public class Consultant implements Serializable {
 	}
 
 	public void ajouterCompetence(String comp) {
-		comptences.add(comp);
+		competences.add(comp);
 	}
 
 	public  void retirerCompetence(String comp){
-		for(String val : comptences){
-			Iterator<String> iterator = comptences.iterator();
+		for(String val : competences){
+			Iterator<String> iterator = competences.iterator();
 			while (iterator.hasNext()){
 				String a = iterator.next();
 				if(a == comp){
@@ -75,6 +75,6 @@ public class Consultant implements Serializable {
 	@Override
 	public String toString() {
 		return "Consultant [nom=" + nom + ", prenom=" + prenom + ", adresse="
-				+ adresse + ", telephone=" + telephone + "Liste compétence" + comptences + "]";
+				+ adresse + ", telephone=" + telephone + "Liste compétence" + competences + "]";
 	}			
 }
