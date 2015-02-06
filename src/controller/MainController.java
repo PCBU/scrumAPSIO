@@ -70,9 +70,6 @@ public class MainController {
         } else if (splitCommande[0].equals("creerconsultant")) {
             creerConsultant(splitCommande);
 
-        } else if (splitCommande[0].equals("listeconsultantlibre")) {
-            mainView.afficher("Liste des consultants actuellement libres :");
-
         } else if (splitCommande[0].equals("clear")) {
             mainView.effacer();
 
