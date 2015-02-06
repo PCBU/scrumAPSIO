@@ -1,10 +1,13 @@
 package view;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
 import controller.MainController;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class MainView{
 
@@ -103,6 +106,8 @@ public class MainView{
 		mainFrame.setSize(800, 400);
 		mainFrame.setVisible(true);
 		mainFrame.setLocationRelativeTo(null);
+
+		this.afficher("Vous n'êtes actuellement pas connecté.\nPour remédier à cela, tapez la commande login;Identifiant;Mot de passe");
 	}
 
 	/**
@@ -124,12 +129,11 @@ public class MainView{
 	{
 		contenu.setText("");
 	}
-	
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MainView frame = new MainView();		
+		MainView frame = new MainView();
 	}
 }
