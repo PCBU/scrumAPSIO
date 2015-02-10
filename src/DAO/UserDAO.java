@@ -10,10 +10,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Dikyx on 06/02/2015.
- */
 public class UserDAO {
+
+
 
     public static List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<User>();
