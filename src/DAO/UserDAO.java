@@ -15,34 +15,66 @@ import java.util.List;
  */
 public class UserDAO {
 
-    public List<User> getAllUsers() throws SQLException {
+    public static List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<User>();
-        PreparedStatement ps;
+        PreparedStatement ps = null;
         ResultSet rs;
-        Connection db = getDB.getDB();
+        Connection db = null;
 
-        ps = db.prepareCall("SELECT * FROM users");
-        ps.execute();
+        try {
+            db = getDB.getDB();
 
-        rs = ps.getResultSet();
-        while (rs.next()) {
-            users.add(new User(rs.getString("login"), rs.getString("password"), rs.getString("role")));
+            ps = db.prepareCall("SELECT * FROM users");
+            ps.execute();
+
+            rs = ps.getResultSet();
+            while (rs.next()) {
+                users.add(new User(rs.getString("login"), rs.getString("password"), rs.getString("role")));
+            }
+        } finally {
+
+            if (ps != null) {
+                ps.close();
+            }
+
+            if (db != null) {
+                db.close();
+            }
+            return users;
+
         }
-
-        return users;
     }
 
-    public void addUser(User user) throws SQLException {
-        PreparedStatement ps;
-        Connection db = getDB.getDB();
+    public static void addUser(User user) throws SQLException {
+        PreparedStatement ps = null;
+        Connection db = null;
 
-        ps = db.prepareStatement("INSERT INTO users VALUES (?, ?, ?, ?)");
-        ps.setString(1, user.getLogin());
-        ps.setString(2, user.getPassword());
-        ps.setString(3, user.getRole());
+        try {
+            db = getDB.getDB();
+            ps = db.prepareStatement("INSERT INTO users VALUES (?, ?, ?, ?)");
+            ps.setString(1, user.getLogin());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getRole());
 
-        ps.executeUpdate();
+            ps.executeUpdate();
 
-        System.out.println("L'utilisateur" + user.getLogin() + "a été ajouté!");
+            System.out.println("L'utilisateur" + user.getLogin() + "a été ajouté!");
+
+        } catch (SQLException e) {
+
+            System.out.println(e.getMessage());
+
+        } finally {
+
+            if (ps != null) {
+                ps.close();
+            }
+
+            if (db != null) {
+                db.close();
+            }
+
+        }
     }
+
 }

@@ -1,8 +1,10 @@
 package controller;
 
+import DAO.UserDAO;
 import model.Client;
 import model.Consultant;
 import model.Mission;
+import model.User;
 import org.joda.time.DateTime;
 import org.joda.time.IllegalFieldValueException;
 import org.joda.time.format.DateTimeFormatter;
@@ -11,8 +13,10 @@ import service.MissionService;
 import view.MainView;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.joda.time.format.DateTimeFormat.forPattern;
@@ -103,7 +107,18 @@ public class MainController {
         } else if (splitCommande[0].equals("disposconsultant")) {
             disposConsultant(splitCommande);
 
-        } else { //cas ou la commande n'est pas reconnue
+        } else if (splitCommande[0].equals("getAllUsers")) { // test de la DB
+            try {
+                List<User> users = UserDAO.getAllUsers();
+                for (User myUser : users){
+                    mainView.afficher(myUser.toString());
+                }
+            } catch (SQLException e){
+                mainView.afficher("Impossible de récupérer les utilisateurs");
+            }
+
+        }
+        else { //cas ou la commande n'est pas reconnue
             mainView.afficher("commande '" + commande + "' inconnue.");
         }
     }
