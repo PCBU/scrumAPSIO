@@ -131,8 +131,8 @@ public class MainController {
             } else if (splitCommande[0].equals("ajoutcompetence")) {
                 nouvelleComp(splitCommande);
 
-            } else if (splitCommande[0].equals("suprcompetence")) {
-                suprComp(splitCommande);
+            } else if (splitCommande[0].equals("supprcompetence")) {
+                supprComp(splitCommande);
 
 
             } else { //cas ou la commande n'est pas reconnue
@@ -557,10 +557,12 @@ public class MainController {
 
         } else if (commande.equals("notloggedin")) {
             mainView.afficher("Vous n'êtes actuellement pas connecté.\nPour remédier à cela, tapez la commande login;Identifiant;Mot de passe");
+
         } else if (commande.equals("ajoutcompetence")) {
-            mainView.afficher("Format de date incorrect. Le format valide est ajoutcompetence;consultant;competance");
-        } else if (commande.equals("suprcompetence")) {
-            mainView.afficher("Format de date incorrect. Le format valide est suprcompetence;consultant;competance");
+            mainView.afficher("Format de date incorrect. Le format valide est ajoutcompetence;nomConsultant;compétence");
+
+        } else if (commande.equals("supprcompetence")) {
+            mainView.afficher("Format de date incorrect. Le format valide est supprcompetence;nomConsultant;compétence");
         }
     }
 
@@ -685,11 +687,19 @@ public class MainController {
         }
     }
 
-    private void suprComp(String[] commande) {
+    private void supprComp(String[] commande) {
+    boolean passage;
+
         if (commande.length == 3) {
-            consultants.get(commande[1]).retirerCompetence(commande[2]);
-            enregistrerListeConsultant();
-            mainView.afficher("Compétence : " + commande[2] + " supprimer.");
+            passage = consultants.get(commande[1]).retirerCompetence(commande[2]);
+            if(passage){
+                mainView.afficher("Compétence : " + commande[2] + " supprimer.");
+                enregistrerListeConsultant();
+            } else  {
+
+                mainView.afficher("Compétence : " + commande[2] + " inconnue.");
+            }
+
 
         } else {
             afficherSyntaxe(commande[0]);

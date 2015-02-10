@@ -61,20 +61,23 @@ public class Consultant implements Serializable {
 		competences.add(comp);
 	}
 
-	public  void retirerCompetence(String comp){
+	public  boolean retirerCompetence(String comp){
+		boolean passage = false;
+		Iterator<String> iterator = competences.iterator();
 
-			Iterator<String> iterator = competences.iterator();
-			while (iterator.hasNext()){
-				String a = iterator.next();
-				if(a.equals(comp)){
-					iterator.remove();
-				}
+		while (iterator.hasNext() && !passage) {
+			String a = iterator.next();
+			if(a.equals(comp)) {
+				iterator.remove();
+				passage = true;
 			}
+		}
 
+		return passage;
 	}
 	@Override
 	public String toString() {
 		return "Consultant [nom=" + nom + ", prenom=" + prenom + ", adresse="
-				+ adresse + ", telephone=" + telephone + "Liste compétence" + competences + "]";
+				+ adresse + ", telephone=" + telephone + "Liste compétences : " + competences + "]";
 	}			
 }
