@@ -86,8 +86,7 @@ public class MainView{
 
 				if(String.valueOf(arg0.getKeyChar()).equals("\t"))
 				{
-					String toto = AutoComplete(commande.getText());
-					commande.setText(toto);
+					commande.setText(AutoComplete(commande.getText()));
 				}
 			}
 			
