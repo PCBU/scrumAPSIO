@@ -1,9 +1,11 @@
 package controller;
 
 import javafx.util.Pair;
+import DAO.UserDAO;
 import model.Client;
 import model.Consultant;
 import model.Mission;
+import model.User;
 import org.joda.time.DateTime;
 import org.joda.time.IllegalFieldValueException;
 import org.joda.time.format.DateTimeFormatter;
@@ -11,9 +13,11 @@ import service.ConsultantService;
 import view.MainView;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static org.joda.time.format.DateTimeFormat.forPattern;
@@ -131,14 +135,79 @@ public class MainController {
             } else if (splitCommande[0].equals("ajoutcompetence")) {
                 nouvelleComp(splitCommande);
 
-            } else if (splitCommande[0].equals("suprcompetence")) {
-                suprComp(splitCommande);
+            } else if (splitCommande[0].equals("renvoyerconsultant")) {
+                renvoyerConsultant(splitCommande);
+
+            } else if (splitCommande[0].equals("supprcompetence")) {
+                supprComp(splitCommande);
+
+            } else if (splitCommande[0].equals("getAllUsers")) { // test de la DB
+                try {
+                    List<User> users = UserDAO.getAllUsers();
+                    for (User myUser : users) {
+                        mainView.afficher(myUser.toString());
+                    }
+                } catch (SQLException e) {
+                    mainView.afficher("Impossible de récupérer les utilisateurs");
+                }
+
+            } else if (splitCommande[0].equals("clientsansmission")) {
+                clientSansMission(splitCommande);
 
 
             } else { //cas ou la commande n'est pas reconnue
                 mainView.afficher("commande '" + commande + "' inconnue.");
             }
         }
+    }
+
+    private void renvoyerConsultant(String[] splitCommande) {
+        if (splitCommande.length != 2) {
+            afficherSyntaxe(splitCommande[0]);
+        } else {
+            if (loggedIn.equals("directeur")) {
+                renvoiAlgorithme(splitCommande);
+
+            } else {
+                boolean isFound = false;
+
+                for (Iterator<String> iterator = managers.get(loggedIn).iterator(); iterator.hasNext() && !isFound; ) {
+                    String consultantDuManager = iterator.next();
+                    if (splitCommande[1].equals(consultantDuManager)) {
+                        isFound = true;
+                    }
+                }
+
+                if (isFound) {
+                    renvoiAlgorithme(splitCommande);
+                }
+            }
+        }
+    }
+
+    private void renvoiAlgorithme(String[] splitCommande) {
+        //Remove from missions
+        for (Map.Entry<String, Mission> entry : missions.entrySet()) {
+            if (entry.getValue().getConsultant() != null) {
+                if (entry.getValue().getConsultant().getNom().equals(splitCommande[1])) {
+                    entry.getValue().setConsultant(null);
+                }
+            }
+        }
+
+        //Remove from managers
+        for (Map.Entry<String, ArrayList<String>> entry : managers.entrySet()) {
+            for (String consultant : entry.getValue()) {
+                if (consultant.equals(splitCommande[1])) {
+                    entry.getValue().remove(consultant);
+                }
+            }
+        }
+
+        //Remove from consultants
+        consultants.remove(splitCommande[1]);
+
+        mainView.afficher("Le consultant " + splitCommande[1] + " a été correctement renvoyé.");
     }
 
     private void login(String[] splitCommande) {
@@ -151,12 +220,20 @@ public class MainController {
             listeUsers.add(new Pair<String, String>("directeur", "password")); //TODO remove when database is available
             listeUsers.add(new Pair<String, String>("roger", "password")); //TODO remove when database is available
 
+            boolean connected = false;
+
             for (Pair<String, String> user : listeUsers) {
                 if (splitCommande[1].equals(user.getKey()) && splitCommande[2].equals(user.getValue())) {
                     loggedIn = splitCommande[1];//getUserStatus(user.getKey());
                     mainView.afficher("Vous êtes maintenant connecté en tant que " + user.getKey()
                             + "\nPour vous déconnecter, utilisez la commande 'deconnexion'.");
+
+                    connected = true;
                 }
+            }
+
+            if (!connected) {
+                mainView.afficher("Identifiants erronés. Veuillez réessayer.");
             }
         }
     }
@@ -173,7 +250,27 @@ public class MainController {
                 mainView.afficher("Le consultant " + commande[1] + "n'existe pas.");
             } else {
                 if (loggedIn.equals("directeur")) {
+                    ArrayList<DateTime[]> dispos = new ArrayList<DateTime[]>();
 
+                    for (Map.Entry<String, Mission> entry : missions.entrySet()) {
+                        Mission mission = entry.getValue();
+
+                        if (mission.getConsultant().getNom().equals(consultant.getNom())) {
+                            DateTime[] dates = {mission.getDebut(), mission.getFin()};
+
+                            dispos.add(dates);
+                        }
+                    }
+
+                    if (dispos.isEmpty()) {
+                        mainView.afficher("Le consultant " + consultant.getNom() + " est actuellement totalement disponible.");
+                    } else {
+                        mainView.afficher("Le consultant " + consultant.getNom() + " est indisponible entre les dates suivantes :");
+
+                        for (DateTime[] dates : dispos) {
+                            mainView.afficher("Du " + dates[0] + " au " + dates[1]);
+                        }
+                    }
                 } else {
                     boolean isFound = false;
 
@@ -552,15 +649,26 @@ public class MainController {
         } else if (commande.equals("login")) {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nlogin;Identifiant;Mot de passe");
 
+        } else if (commande.equals("ajoutcompetence")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\najoutcompetence;nomConsultant;compétence");
+
+        } else if (commande.equals("supprcompetence")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nsupprcompetence;Nom consultant;compétence");
+
+        } else if (commande.equals("renvoyerconsultant")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nrenvoyerconsultant;Nom consultant");
+
         } else if (commande.equals("date")) {
             mainView.afficher("Format de date incorrect. Le format valide est jjmmaaaa.\nPour le 1er mars 2015, la syntaxe est : 01032015");
 
         } else if (commande.equals("notloggedin")) {
             mainView.afficher("Vous n'êtes actuellement pas connecté.\nPour remédier à cela, tapez la commande login;Identifiant;Mot de passe");
+
         } else if (commande.equals("ajoutcompetence")) {
-            mainView.afficher("Format de date incorrect. Le format valide est ajoutcompetence;consultant;competance");
-        } else if (commande.equals("suprcompetence")) {
-            mainView.afficher("Format de date incorrect. Le format valide est suprcompetence;consultant;competance");
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\najoutcompetence;nomConsultant;compétence");
+
+        } else if (commande.equals("supprcompetence")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nsupprcompetence;nomConsultant;compétence");
         }
     }
 
@@ -685,14 +793,55 @@ public class MainController {
         }
     }
 
-    private void suprComp(String[] commande) {
+    private void supprComp(String[] commande) {
+        boolean passage;
+
         if (commande.length == 3) {
-            consultants.get(commande[1]).retirerCompetence(commande[2]);
-            enregistrerListeConsultant();
-            mainView.afficher("Compétence : " + commande[2] + " supprimer.");
+            passage = consultants.get(commande[1]).retirerCompetence(commande[2]);
+            if (passage) {
+                mainView.afficher("Compétence : " + commande[2] + " supprimer.");
+                enregistrerListeConsultant();
+            } else {
+
+                mainView.afficher("Compétence : " + commande[2] + " inconnue.");
+            }
+
 
         } else {
             afficherSyntaxe(commande[0]);
         }
     }
+
+    private void clientSansMission(String[] commande) {
+
+        ArrayList<Client> clientMissions = new ArrayList<Client>();
+        ArrayList<Client> lesClients = new ArrayList<Client>();
+        boolean passer = false;
+
+        for (Map.Entry<String, Mission> Entry : missions.entrySet()) {
+            clientMissions.add(Entry.getValue().getClient());
+        }
+
+        for (Map.Entry<String, Client> entry : clients.entrySet()) {
+            passer = false;
+            for (Client c : clientMissions) {
+                if (c.equals(entry.getValue())) {
+                    passer = true;
+                }
+            }
+            if (!passer) {
+                lesClients.add(entry.getValue());
+            }
+        }
+
+        mainView.afficher("Les clients sans mission sont : ");
+        for (Client c : lesClients) {
+            mainView.afficher(c.getNom());
+        }
+    }
 }
+
+
+
+
+

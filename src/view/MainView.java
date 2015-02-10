@@ -114,7 +114,7 @@ public class MainView{
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setSize(800, 400);
 		mainFrame.setVisible(true);
-		mainFrame.setLocationRelativeTo(null);
+
 
 		this.afficher("Vous n'êtes actuellement pas connecté.\nPour remédier à cela, tapez la commande login;Identifiant;Mot de passe");
 	}
