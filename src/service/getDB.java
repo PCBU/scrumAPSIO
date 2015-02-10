@@ -4,9 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * Created by Dikyx on 06/02/2015.
- */
 public class getDB {
 
     private static final String DB_DRIVER = "com.mysql.jdbc.Driver";
@@ -31,7 +28,6 @@ public class getDB {
 
             dbConnection = DriverManager.getConnection(
                     DB_CONNECTION, DB_USER, DB_PASSWORD);
-            return dbConnection;
 
         } catch (SQLException e) {
 
