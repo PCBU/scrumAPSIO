@@ -151,12 +151,20 @@ public class MainController {
             listeUsers.add(new Pair<String, String>("directeur", "password")); //TODO remove when database is available
             listeUsers.add(new Pair<String, String>("roger", "password")); //TODO remove when database is available
 
+            boolean connected = false;
+
             for (Pair<String, String> user : listeUsers) {
                 if (splitCommande[1].equals(user.getKey()) && splitCommande[2].equals(user.getValue())) {
                     loggedIn = splitCommande[1];//getUserStatus(user.getKey());
                     mainView.afficher("Vous êtes maintenant connecté en tant que " + user.getKey()
                             + "\nPour vous déconnecter, utilisez la commande 'deconnexion'.");
+
+                    connected = true;
                 }
+            }
+
+            if (!connected) {
+                mainView.afficher("Identifiants erronés. Veuillez réessayer.");
             }
         }
     }
@@ -559,10 +567,10 @@ public class MainController {
             mainView.afficher("Vous n'êtes actuellement pas connecté.\nPour remédier à cela, tapez la commande login;Identifiant;Mot de passe");
 
         } else if (commande.equals("ajoutcompetence")) {
-            mainView.afficher("Format de date incorrect. Le format valide est ajoutcompetence;nomConsultant;compétence");
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\najoutcompetence;nomConsultant;compétence");
 
         } else if (commande.equals("supprcompetence")) {
-            mainView.afficher("Format de date incorrect. Le format valide est supprcompetence;nomConsultant;compétence");
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nsupprcompetence;nomConsultant;compétence");
         }
     }
 
