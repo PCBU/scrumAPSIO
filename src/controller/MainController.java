@@ -131,14 +131,65 @@ public class MainController {
             } else if (splitCommande[0].equals("ajoutcompetence")) {
                 nouvelleComp(splitCommande);
 
+            } else if (splitCommande[0].equals("renvoyerconsultant")) {
+                renvoyerConsultant(splitCommande);
+
             } else if (splitCommande[0].equals("supprcompetence")) {
                 supprComp(splitCommande);
-
 
             } else { //cas ou la commande n'est pas reconnue
                 mainView.afficher("commande '" + commande + "' inconnue.");
             }
         }
+    }
+
+    private void renvoyerConsultant(String[] splitCommande) {
+        if (splitCommande.length != 2) {
+            afficherSyntaxe(splitCommande[0]);
+        } else {
+            if (loggedIn.equals("directeur")) {
+                renvoiAlgorithme(splitCommande);
+
+            } else {
+                boolean isFound = false;
+
+                for (Iterator<String> iterator = managers.get(loggedIn).iterator(); iterator.hasNext() && !isFound; ) {
+                    String consultantDuManager = iterator.next();
+                    if (splitCommande[1].equals(consultantDuManager)) {
+                        isFound = true;
+                    }
+                }
+
+                if (isFound) {
+                    renvoiAlgorithme(splitCommande);
+                }
+            }
+        }
+    }
+
+    private void renvoiAlgorithme(String[] splitCommande) {
+        //Remove from missions
+        for (Map.Entry<String, Mission> entry : missions.entrySet()) {
+            if (entry.getValue().getConsultant() != null) {
+                if (entry.getValue().getConsultant().getNom().equals(splitCommande[1])) {
+                    entry.getValue().setConsultant(null);
+                }
+            }
+        }
+
+        //Remove from managers
+        for (Map.Entry<String, ArrayList<String>> entry : managers.entrySet()) {
+            for (String consultant : entry.getValue()) {
+                if (consultant.equals(splitCommande[1])) {
+                    entry.getValue().remove(consultant);
+                }
+            }
+        }
+
+        //Remove from consultants
+        consultants.remove(splitCommande[1]);
+
+        mainView.afficher("Le consultant " + splitCommande[1] + " a été correctement renvoyé.");
     }
 
     private void login(String[] splitCommande) {
@@ -181,7 +232,27 @@ public class MainController {
                 mainView.afficher("Le consultant " + commande[1] + "n'existe pas.");
             } else {
                 if (loggedIn.equals("directeur")) {
+                    ArrayList<DateTime[]> dispos = new ArrayList<DateTime[]>();
 
+                    for (Map.Entry<String, Mission> entry : missions.entrySet()) {
+                        Mission mission = entry.getValue();
+
+                        if (mission.getConsultant().getNom().equals(consultant.getNom())) {
+                            DateTime[] dates = {mission.getDebut(), mission.getFin()};
+
+                            dispos.add(dates);
+                        }
+                    }
+
+                    if (dispos.isEmpty()) {
+                        mainView.afficher("Le consultant " + consultant.getNom() + " est actuellement totalement disponible.");
+                    } else {
+                        mainView.afficher("Le consultant " + consultant.getNom() + " est indisponible entre les dates suivantes :");
+
+                        for (DateTime[] dates : dispos) {
+                            mainView.afficher("Du " + dates[0] + " au " + dates[1]);
+                        }
+                    }
                 } else {
                     boolean isFound = false;
 
@@ -560,17 +631,20 @@ public class MainController {
         } else if (commande.equals("login")) {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nlogin;Identifiant;Mot de passe");
 
+        } else if (commande.equals("ajoutcompetence")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\najoutcompetence;nomConsultant;compétence");
+
+        } else if (commande.equals("supprcompetence")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nsupprcompetence;Nom consultant;compétence");
+
+        } else if (commande.equals("renvoyerconsultant")) {
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nrenvoyerconsultant;Nom consultant");
+
         } else if (commande.equals("date")) {
             mainView.afficher("Format de date incorrect. Le format valide est jjmmaaaa.\nPour le 1er mars 2015, la syntaxe est : 01032015");
 
         } else if (commande.equals("notloggedin")) {
             mainView.afficher("Vous n'êtes actuellement pas connecté.\nPour remédier à cela, tapez la commande login;Identifiant;Mot de passe");
-
-        } else if (commande.equals("ajoutcompetence")) {
-            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\najoutcompetence;nomConsultant;compétence");
-
-        } else if (commande.equals("supprcompetence")) {
-            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nsupprcompetence;nomConsultant;compétence");
         }
     }
 
