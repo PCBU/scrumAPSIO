@@ -6,6 +6,7 @@ public class Client implements Serializable {
     private String nom;
     private String prenom;
     private String adresse;
+
     private String telephone;
 
     public Client() {
@@ -58,4 +59,29 @@ public class Client implements Serializable {
         return "Client [nom=" + nom + ", prenom=" + prenom + ", adresse="
                 + adresse + ", telephone=" + telephone + "]";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Client client = (Client) o;
+
+        if (adresse != null ? !adresse.equals(client.adresse) : client.adresse != null) return false;
+        if (!nom.equals(client.nom)) return false;
+        if (prenom != null ? !prenom.equals(client.prenom) : client.prenom != null) return false;
+        if (telephone != null ? !telephone.equals(client.telephone) : client.telephone != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = nom.hashCode();
+        result = 31 * result + (prenom != null ? prenom.hashCode() : 0);
+        result = 31 * result + (adresse != null ? adresse.hashCode() : 0);
+        result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
+        return result;
+    }
+
 }
