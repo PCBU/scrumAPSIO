@@ -135,6 +135,10 @@ public class MainController {
                 supprComp(splitCommande);
 
 
+            } else if (splitCommande[0].equals("clientsansmission")) {
+                clientSansMission(splitCommande);
+
+
             } else { //cas ou la commande n'est pas reconnue
                 mainView.afficher("commande '" + commande + "' inconnue.");
             }
@@ -696,14 +700,14 @@ public class MainController {
     }
 
     private void supprComp(String[] commande) {
-    boolean passage;
+        boolean passage;
 
         if (commande.length == 3) {
             passage = consultants.get(commande[1]).retirerCompetence(commande[2]);
-            if(passage){
+            if (passage) {
                 mainView.afficher("Compétence : " + commande[2] + " supprimer.");
                 enregistrerListeConsultant();
-            } else  {
+            } else {
 
                 mainView.afficher("Compétence : " + commande[2] + " inconnue.");
             }
@@ -713,4 +717,37 @@ public class MainController {
             afficherSyntaxe(commande[0]);
         }
     }
+
+    private void clientSansMission(String[] commande) {
+
+        ArrayList<Client> clientMissions = new ArrayList<Client>();
+        ArrayList<Client> lesClients = new ArrayList<Client>();
+        boolean passer = false;
+
+        for (Map.Entry<String, Mission> Entry : missions.entrySet()) {
+            clientMissions.add(Entry.getValue().getClient());
+        }
+
+        for (Map.Entry<String, Client> entry : clients.entrySet()) {
+            passer = false;
+            for (Client c : clientMissions) {
+                if (c.equals(entry.getValue())) {
+                    passer = true;
+                }
+            }
+            if (!passer) {
+                lesClients.add(entry.getValue());
+            }
+        }
+
+        mainView.afficher("Les clients sans mission sont : ");
+        for (Client c : lesClients) {
+            mainView.afficher(c.getNom());
+        }
+    }
 }
+
+
+
+
+

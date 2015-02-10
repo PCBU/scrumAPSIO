@@ -77,6 +77,7 @@ public class Mission implements Serializable {
 				", debut=" + debut +
 				", fin=" + fin +
 				", intitule='" + intitule + '\'' +
+				", client = " + client +
 				'}';
 	}
 
