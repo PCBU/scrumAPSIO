@@ -106,8 +106,8 @@ public class MainController {
             } else if (splitCommande[0].equals("retourmission")) {
                 retourMission(splitCommande);
 
-            } else if (splitCommande[0].equals("listecommandes")) {
-                listeCommandes();
+            } else if (splitCommande[0].equals("historique")) {
+                Historique();
 
             } else if (splitCommande[0].equals("consultantsdisponibles")) {
                 consultantsDisponibles();
@@ -263,7 +263,7 @@ public class MainController {
         }
     }
 
-    private void listeCommandes() {
+    private void Historique() {
         mainView.afficher("Commandes effectuées :");
 
         for (String commande : commandes) {

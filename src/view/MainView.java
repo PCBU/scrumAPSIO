@@ -1,6 +1,7 @@
 package view;
 
 import controller.MainController;
+import model.ListeCommande;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,9 +65,10 @@ public class MainView{
 		JPanel P1 = new JPanel(new BorderLayout());
 		contenu = new JTextArea();
 		contenu.setEnabled(true);
-		contenu.setEditable(false);				
-		
+		contenu.setEditable(false);
+
 		commande = new JTextField();
+		commande.setFocusTraversalKeysEnabled(false);
 		Bouton = new JButton("Envoyer");
 		Bouton.addMouseListener(interact);
 
@@ -75,11 +77,17 @@ public class MainView{
 
 			@Override
 			public void keyTyped(KeyEvent arg0) {
-				String key = arg0.getKeyChar()+"";				
+				String key = arg0.getKeyChar()+"";
 				if(key.equals("\n")) 
 				{
 					mainController.commande(commande.getText());
 					commande.setText("");
+				}
+
+				if(String.valueOf(arg0.getKeyChar()).equals("\t"))
+				{
+					String toto = AutoComplete(commande.getText());
+					commande.setText(toto);
 				}
 			}
 			
@@ -89,6 +97,7 @@ public class MainView{
 			
 			@Override
 			public void keyPressed(KeyEvent arg0) {
+				System.out.println("");
 			}
 		});
 		
@@ -135,5 +144,27 @@ public class MainView{
 	 */
 	public static void main(String[] args) {
 		MainView frame = new MainView();
+	}
+
+
+		/**
+	 * Retourn la commande qui commence par le texte entré en paramètre
+	 * @param text
+	 * @return
+	 */
+	public static String AutoComplete(String text) {
+
+		int textSize = text.length();
+		String commandReturn = text;
+
+		for (ListeCommande commande : ListeCommande.values()) {
+			if (commande.toString().length() >= textSize) {
+				if (commande.toString().substring(0, textSize).equals(text)) {
+					commandReturn = commande.toString();
+					break;
+				}
+			}
+		}
+		return commandReturn;
 	}
 }
