@@ -155,6 +155,12 @@ public class MainController {
                 clientSansMission(splitCommande);
 
 
+            } else if(splitCommande[0].equals("ajouterabscence")){ //nomConsultant;debut;fin
+              ajoutAbsence(splitCommande);
+
+            }else if (splitCommande[0].equals("retirerabsence")){
+              retirerAbsence(splitCommande);
+
             } else { //cas ou la commande n'est pas reconnue
                 mainView.afficher("commande '" + commande + "' inconnue.");
             }
@@ -669,6 +675,12 @@ public class MainController {
 
         } else if (commande.equals("supprcompetence")) {
             mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nsupprcompetence;nomConsultant;compétence");
+
+        }else if (commande.equals("ajouterabscence")){
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\najouterabscence;nomConsultant;jjmmaaaa;jjmmaaaa");
+
+        }else if(commande.equals("retirerabsence")){
+            mainView.afficher("Syntaxe incorrecte. La syntaxe valide est :\nretirerabsence;nomConsultant;jjmmaaaa");
         }
     }
 
@@ -837,6 +849,32 @@ public class MainController {
         mainView.afficher("Les clients sans mission sont : ");
         for (Client c : lesClients) {
             mainView.afficher(c.getNom());
+        }
+    }
+
+    private void ajoutAbsence(String[] commande){
+
+        DateTimeFormatter formatter = forPattern("ddMMyyyy");
+
+        if(commande.length == 4){
+            consultants.get(commande[1]).ajoutAbscence(DateTime.parse(commande[2], formatter), DateTime.parse(commande[3], formatter));
+            mainView.afficher("Absence ajouter.");
+            enregistrerListeConsultant();
+        } else{
+            afficherSyntaxe(commande[0]);
+        }
+
+
+    }
+    private void retirerAbsence(String[] commande){
+        DateTimeFormatter formatter = forPattern("ddMMyyyy");
+
+        if(commande.length == 3){
+            consultants.get(commande[1]).retirerAbscence(DateTime.parse(commande[2], formatter));
+            mainView.afficher("Absence retiré");
+            enregistrerListeConsultant();
+        }else{
+            afficherSyntaxe(commande[0]);
         }
     }
 }

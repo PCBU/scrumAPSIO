@@ -1,5 +1,8 @@
 package model;
 
+import javafx.util.Pair;
+import org.joda.time.DateTime;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,6 +13,7 @@ public class Consultant implements Serializable {
 	private String adresse;
 	private String telephone;
 	private ArrayList<String> competences;
+	private ArrayList<Pair<DateTime, DateTime>> abscences;
 	
 	public Consultant() {
 		super();
@@ -23,6 +27,7 @@ public class Consultant implements Serializable {
 		this.adresse = adresse;
 		this.telephone = telephone;
 		this.competences = new ArrayList<String>();
+		this.abscences = new ArrayList<Pair<DateTime, DateTime>>();
 	}
 
 	public String getNom() {
@@ -75,9 +80,26 @@ public class Consultant implements Serializable {
 
 		return passage;
 	}
+
+	public void ajoutAbscence(DateTime debut, DateTime fin){
+		abscences.add(new Pair<DateTime, DateTime>(debut, fin));
+	}
+
+	public void retirerAbscence(DateTime debut){
+		int i = 0;
+		for(Pair<DateTime, DateTime> l : abscences){
+
+			if(l.getKey().equals(debut)){
+				abscences.remove(i);
+			}
+			i++;
+		}
+
+	}
 	@Override
 	public String toString() {
 		return "Consultant [nom=" + nom + ", prenom=" + prenom + ", adresse="
-				+ adresse + ", telephone=" + telephone + "Liste compétences : " + competences + "]";
+				+ adresse + ", telephone=" + telephone + "Liste compétences : " + competences +
+				"Abscence : " + abscences +"]";
 	}			
 }
