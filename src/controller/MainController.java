@@ -200,8 +200,8 @@ public class MainController {
             try {
                 listeUsers = UserDAO.getAllUsers();
 
-                listeUsers.add(new User("directeur", "password", "directeur"));
-                listeUsers.add(new User("roger", "password", "manager"));
+                //listeUsers.add(new User("directeur", "password", "directeur"));
+                //listeUsers.add(new User("roger", "password", "manager"));
 
                 boolean connected = false;
 
